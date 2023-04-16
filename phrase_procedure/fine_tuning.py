@@ -89,12 +89,15 @@ class FineTuning(object):
             topn = accuracy(all_outputs, all_labels, (1, 5))
 
             if epoch_counter + 1 in self.config['GE_epoch']:
-                GE_trs = GE_plot(predict_proba, plain_GE, self.config)
-                np.save(self.config['outfile'] + 'GE_' + str(epoch_counter + 1) + '.npy', GE_trs)
+                proba_plain = np.hstack((predict_proba, plain_GE))
+                np.save(self.config['outfile'] + 'proba_plain_' + str(epoch_counter + 1) + '.npy', proba_plain)
 
-                if np.min(GE_trs.mean(axis=0)) < self.best_ave_GE:
-                    self.best_ave_GE = np.min(GE_trs.mean(axis=0))
-                    self.best_ave_GE_epoch = epoch_counter + 1
+                # GE_trs = GE_plot(predict_proba, plain_GE, self.config)
+                # np.save(self.config['outfile'] + 'GE_' + str(epoch_counter + 1) + '.npy', GE_trs)
+                #
+                # if np.min(GE_trs.mean(axis=0)) < self.best_ave_GE:
+                #     self.best_ave_GE = np.min(GE_trs.mean(axis=0))
+                #     self.best_ave_GE_epoch = epoch_counter + 1
 
         return topn[0]
 
