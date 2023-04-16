@@ -89,7 +89,7 @@ class FineTuning(object):
             topn = accuracy(all_outputs, all_labels, (1, 5))
 
             if epoch_counter + 1 in self.config['GE_epoch']:
-                proba_plain = np.hstack((predict_proba, plain_GE))
+                proba_plain = np.hstack((predict_proba, plain_GE.reshape(-1, 1)))
                 np.save(self.config['outfile'] + 'proba_plain_' + str(epoch_counter + 1) + '.npy', proba_plain)
 
                 # GE_trs = GE_plot(predict_proba, plain_GE, self.config)
