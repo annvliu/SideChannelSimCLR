@@ -121,6 +121,7 @@ def change_GE(no, GE, GE_epoch):
 
     update_GE = "UPDATE SimCLR_result SET GE = " + str(GE) + ", GE_epoch = " + str(GE_epoch) + " where no = " + str(no)
     cur.execute(update_GE)
+    conn.commit()
 
     # 关闭连接
     cur.close()
