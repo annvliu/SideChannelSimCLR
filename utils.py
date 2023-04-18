@@ -31,7 +31,7 @@ def load_config_data(path: str) -> dict:
     :return: the config as a dict
     """
     with open(path) as f:
-        cfg: dict = yaml.load(f, Loader=yaml.FullLoader)
+        cfg: dict = yaml.load(f, Loader=yaml.Loader)
     return cfg
 
 
