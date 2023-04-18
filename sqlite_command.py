@@ -112,3 +112,16 @@ def select_path_from_no(no):
     conn.close()
 
     return path
+
+
+def change_GE(no, GE, GE_epoch):
+    # 连接表
+    conn = sqlite3.connect('SimCLR_result.db')
+    cur = conn.cursor()
+
+    update_GE = "UPDATE SimCLR_result SET GE = " + str(GE) + ", GE_epoch = " + str(GE_epoch) + " where no = " + str(no)
+    cur.execute(update_GE)
+
+    # 关闭连接
+    cur.close()
+    conn.close()
