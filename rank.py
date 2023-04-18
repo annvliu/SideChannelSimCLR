@@ -1,5 +1,9 @@
 import numpy as np
 import torch
+import multiprocessing
+
+from sqlite_command import select_path_from_no, change_GE
+from utils import load_config_data
 
 
 class Sbox:
@@ -80,3 +84,74 @@ def GE_plot(probability, plain, config: dict):
 
     GE = np.asarray(GE)
     return GE
+
+
+def once_GE(process_no, trs_num, key_proba, config, result):
+    for run_time in range(10):
+        trs_random = np.arange(trs_num)
+        np.random.seed(run_time * process_no)
+        np.random.shuffle(trs_random)
+
+        this_run_GE = np.zeros(int(trs_num / config['GE_every']), dtype=float)
+        for i in range(1, int(trs_num / config['GE_every']) + 1):
+            if i % 100 == 0:
+                print("正在计算第", 10 * process_no + run_time, "次攻击", i * config['GE_every'], "条波形的GE")
+
+            tmp_id = trs_random[:i * config['GE_every'] + 1]
+            tmp_proba = np.sum(key_proba[tmp_id], axis=0)
+            rank = sum(tmp_proba > tmp_proba[config['common']['true_key']])
+            this_run_GE[i - 1] = rank
+
+        result.put(this_run_GE)
+
+
+def GE_plot_multiprocess(probability, plain, config: dict):
+    trs_num = plain.shape[0]
+
+    key_proba = np.zeros((trs_num, 256), dtype=float)
+    log_softmax = torch.nn.LogSoftmax(dim=1)
+    attack_proba = log_softmax(torch.from_numpy(probability))
+    for j in range(trs_num):
+        for candidate_key in range(256):
+            key_proba[j][candidate_key] = attack_proba[j][
+                compute_leakage(config['common']['dataset_name'], plain[j], candidate_key)]
+
+    result = multiprocessing.Queue()
+    process_list = []
+    for run_no in range(int(config['GE_run_time'] / 10)):
+        new_process = multiprocessing.Process(target=once_GE, args=(run_no, trs_num, key_proba, config, result))
+        process_list.append(new_process)
+        new_process.start()
+
+    GE = []
+    for new_process in process_list:
+        while new_process.is_alive():
+            while not result.empty():
+                GE.append(result.get())
+
+    for new_process in process_list:
+        new_process.join()
+
+    GE = np.asarray(GE)
+    print(GE.shape)
+
+    return GE
+
+
+def calculate_tuning_GE(no):
+    path = select_path_from_no(no)
+    cfg = load_config_data(path + 'config.yml')
+
+    min_GE = 0x3F3F3F3F
+    min_GE_epoch = -1
+    for GE_epoch in cfg['GE_epoch']:
+        proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')
+        proba = proba_plain[:, :-1]
+        plain = proba_plain[:, -1]
+        GE = GE_plot_multiprocess(proba, plain, cfg)
+        np.save(path + 'GE_' + str(GE_epoch) + '.npy', GE)
+
+        if np.min(GE.mean(axis=0)) < min_GE:
+            min_GE = np.min(GE.mean(axis=0))
+            min_GE_epoch = GE_epoch
+    change_GE(no, min_GE, min_GE_epoch)
