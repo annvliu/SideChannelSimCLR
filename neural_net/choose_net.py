@@ -23,6 +23,42 @@ class twolayers_mlp(nn.Module):  # VGG
         return out
 
 
+class Classic_MLP(nn.Module):  # VGG
+    def __init__(self, out_dim, point_num):
+        super().__init__()
+
+        self.dense1 = nn.Sequential(
+            nn.Linear(point_num, 256),
+            nn.ReLU(),
+        )
+
+        self.dense2 = nn.Sequential(
+            nn.Linear(256, 512),
+            nn.ReLU(),
+        )
+
+        self.dense3 = nn.Sequential(
+            nn.Linear(512, 1024),
+            nn.ReLU(),
+        )
+
+        self.dense4 = nn.Sequential(
+            nn.Linear(1024, 1024),
+            nn.ReLU(),
+        )
+
+        self.fc_end = nn.Linear(1024, out_dim)
+
+    def forward(self, x):
+        out = x.to(torch.float32)
+        out = self.dense1(out)
+        out = self.dense2(out)
+        out = self.dense3(out)
+        out = self.dense4(out)
+        out = self.fc_end(out)
+        return out
+
+
 class ches_model(nn.Module):  # VGG
     def __init__(self, out_dim, batch_size):
         super(ches_model, self).__init__()
@@ -199,10 +235,13 @@ def simclr_net(config: dict):
     """ Choose model with model_type """
     net_dict = {"ascad_cnn_block_anti_bn": ascad_cnn_best(out_dim=config["out_dim"],
                                                           point_num=config['common']["feature_num"],
-                                                          dense_input=config['common']["ascad_cnn_block_anti_bn_dense_input"]),
+                                                          dense_input=config['common'][
+                                                              "ascad_cnn_block_anti_bn_dense_input"]),
                 "ascad_cnn": ascad_cnn_best_BN(out_dim=config["out_dim"],
                                                point_num=config['common']["feature_num"],
-                                               dense_input=config['common']["ascad_cnn_dense_input"])}
+                                               dense_input=config['common']["ascad_cnn_dense_input"]),
+                "classic_mlp": Classic_MLP(out_dim=config["out_dim"],
+                                           point_num=config['common']["feature_num"])}
 
     model = net_dict[config['common']["model_name"]]
     return model
