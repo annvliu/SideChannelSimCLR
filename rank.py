@@ -147,7 +147,7 @@ def calculate_tuning_GE(no):
     for GE_epoch in cfg['GE_epoch']:
         proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')
         proba = proba_plain[:, :-1]
-        plain = proba_plain[:, -1]
+        plain = np.asarray(proba_plain[:, -1], dtype=int)
         GE = GE_plot_multiprocess(proba, plain, cfg)
         np.save(path + 'GE_' + str(GE_epoch) + '.npy', GE)
 

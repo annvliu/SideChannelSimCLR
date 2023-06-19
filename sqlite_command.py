@@ -10,15 +10,15 @@ def insert_pretrain(config):
     create_table = "create table if not exists SimCLR_result(no INTEGER PRIMARY KEY AUTOINCREMENT, type text, " \
                    "path text, pretrain_path text, dataset text, train_num number, model text, add_dense int, " \
                    "batch_size number, epoch number, lr number, out_dim number, shift number, cut number, " \
-                   "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int)"
+                   "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int, frozen int)"
     cur.execute(create_table)
 
     # 插入数据
     data = (None, 'pretrain', config['outfile'], None, config['common']['dataset_name'], None,
             config['common']['model_name'], 0, config['common']['batch_size'], config['epoch'], config['lr'],
             config['out_dim'], config["augmentation"]['data_shift'], config["augmentation"]['data_cut'],
-            config["augmentation"]['data_filter'], None, None, None, None)
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            config["augmentation"]['data_filter'], None, None, None, None, None)
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 
@@ -39,16 +39,19 @@ def insert_tuning(config, best_GE, best_GE_epoch):
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
 
-    select_no = "SELECT no FROM SimCLR_result WHERE path = '" + config['pretrain_path'] + "'"
-    cur.execute(select_no)
-    pretrain_no = cur.fetchall()[0][0]
+    if config['pretrain_path'] is None:
+        pretrain_no = None
+    else:
+        select_no = "SELECT no FROM SimCLR_result WHERE path = '" + config['pretrain_path'] + "'"
+        cur.execute(select_no)
+        pretrain_no = cur.fetchall()[0][0]
 
     # 插入数据
     data = (None, 'tuning', config['outfile'], config['pretrain_path'], config['common']['dataset_name'],
             config['train_num'], config['common']['model_name'], 1 if config['add_dense_bool'] else 0,
             config['common']['batch_size'], config['epoch'], config['lr'], config['out_dim'], None, None, None, best_GE,
-            best_GE_epoch, 1 if config['model_eval'] else 0, pretrain_no)
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            best_GE_epoch, 1 if config['model_eval'] else 0, pretrain_no, 1 if config['frozen'] else 0)
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 
@@ -73,15 +76,15 @@ def insert_network(config, best_GE, best_GE_epoch):
     create_table = "create table if not exists SimCLR_result(no INTEGER PRIMARY KEY AUTOINCREMENT, type text, " \
                    "path text, pretrain_path text, dataset text, train_num number, model text, add_dense int, " \
                    "batch_size number, epoch number, lr number, out_dim number, shift number, cut number, " \
-                   "filter number, GE number, GE_epoch number, model_eval int, pretrain_no) "
+                   "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int, frozen int) "
     cur.execute(create_table)
 
     # 插入数据
     data = (None, 'network', config['outfile'], None, config['common']['dataset_name'], config['train_num'],
             config['common']['model_name'], 1 if config['add_dense_bool'] else 0, config['common']['batch_size'],
             config['epoch'], config['lr'], config['out_dim'], None, None, None, best_GE, best_GE_epoch,
-            1 if config['model_eval'] else 0, None)
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            1 if config['model_eval'] else 0, None, 1 if config['frozen'] else 0)
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 

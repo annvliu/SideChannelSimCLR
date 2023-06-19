@@ -1,6 +1,7 @@
 def get_data_info(dataset_name):
     dataset_para = dict()
-    dataset_para['ascad_20k'] = {'dataset_name': 'ascad_20k',
+    dataset_para['ascad_20k'] = {  # filter = 1, shift = 15, cut = 50, 目前最好的是不用filter
+                                 'dataset_name': 'ascad_20k',
                                  'feature_num': 700,
                                  'leakage_model': 'ID',
                                  'classification': 256,
@@ -8,9 +9,9 @@ def get_data_info(dataset_name):
                                  'trs_fname': 'ascad_20k_trs.npy',
                                  'label_fname': 'ascad_20k_label.npy',
                                  'plain_fname': 'ascad_20k_plain.npy',
-                                 'ascad_cnn_block_anti_bn': 10752,
-                                 'ascad_cnn': 10752}
-    dataset_para['EM'] = {  # filter = 1, shift = 5, cut = 5, 目前最好的是只用filter shift
+                                 'ascad_cnn_block_anti_bn_dense_input': 10752,
+                                 'ascad_cnn_dense_input': 10752}
+    dataset_para['EM'] = {  # filter = 1, shift = 5, cut = 5, 目前最好的是都用
                           'dataset_name': 'EM',
                           'feature_num': 90,
                           'leakage_model': 'HD',
@@ -21,7 +22,7 @@ def get_data_info(dataset_name):
                           'plain_fname': 'EM_cipher.npy',
                           'ascad_cnn_block_anti_bn_dense_input': 1024,
                           'ascad_cnn_dense_input': 1024}
-    dataset_para['EM_500'] = {  # filter = 1, shift = 5, cut = 5, 目前最好的是只用filter shift
+    dataset_para['EM_500'] = {  # filter = 1, shift = 5, cut = 5, 目前最好的是都用
                             'dataset_name': 'EM_500',
                             'feature_num': 500,
                             'leakage_model': 'HD',

@@ -43,7 +43,7 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
                                               drop_last=True)
 
     model = simclr_net(config=cfg)
-    model = copy_model_for_classification(model, cfg['pretrain_path'], frozen=False, add_dense=cfg['add_dense_bool'])
+    model = copy_model_for_classification(model, cfg['pretrain_path'], frozen=cfg['frozen'], add_dense=cfg['add_dense_bool'])
 
     # optimizer = LARS(
     #     torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), args.lr, weight_decay=args.weight_decay)
