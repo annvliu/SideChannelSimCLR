@@ -1,0 +1,15 @@
+MasterThesis_test.py
+MasterThesis_test2.py
+sqlite_test.py
+run_main.py
+run_main1.py
+run_main2.py
+run_main3.py
+run_main4.py
+run_svm_rf.py
+run_GEtrsnum.py
+SimCLR_result.db
+png/*
+runs/*
+init_data/*.npy
+init_data/*.png
