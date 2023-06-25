@@ -41,6 +41,13 @@ class ContrastiveLearningDataset:
 
         self.aug = config["augmentation"]
 
+        if config["train_num"] != 0:
+            self.init_data = self.init_data[:config["train_num"]]
+            self.init_label = self.init_label[:config["train_num"]]
+            self.init_plain = self.init_plain[:config["train_num"]]
+
+        print(self.init_data.shape, self.init_label.shape, self.init_plain.shape)
+
     @staticmethod
     def get_simclr_pipeline_transform(aug):  # size, s=1
         """Return a set of data augmentation transformations as described in the SimCLR paper."""

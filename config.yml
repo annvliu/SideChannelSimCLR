@@ -3,7 +3,7 @@ common:
   experiment_no: None
   experiment_type: 'pretrain'
 
-  dataset_name: 'EM'
+  dataset_name: 'ascad_20k'
   init_data_folder: 'init_data/'
   trs_fname: ''
   label_fname: ''
@@ -18,12 +18,15 @@ common:
   device: None
 
   model_name: 'ascad_cnn'  # ascad_cnn_block_anti_bn
-  ascad_cnn_block_anti_bn_dense_input: 1024
-  ascad_cnn_dense_input: 1024
-  batch_size: 400  # 500
+  ascad_cnn_block_anti_bn_dense_input: None
+  ascad_cnn_dense_input: None
+  batch_size: 500  # 400
 
 # pretrain
 pretrain:
+  train_num: 0
+
+  # network
   epoch: 200
   lr: 0.00001
   wd: 0.0001
@@ -43,13 +46,14 @@ pretrain:
 
 tuning:
   # data para
-  train_num: 35000
-  out_dim: 9
+  train_num: 10000 # 35000
+  out_dim: 256 # 9
 
   # model para
   pretrain_path: ''
   model_eval: False
-  epoch: 100
+  frozen: False
+  epoch: 150  # 100
   lr: 0.00001
   add_dense_bool: False
 
