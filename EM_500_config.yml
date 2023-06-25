@@ -1,0 +1,67 @@
+# common paras
+common:
+  experiment_no: None
+  experiment_type: 'pretrain'
+
+  dataset_name: 'EM_500'
+  init_data_folder: 'init_data/'
+  trs_fname: ''
+  label_fname: ''
+  plain_fname: ''
+  feature_num: None
+  leakage_model: None
+  classification: None
+  true_key: None
+
+  disable_cuda: False
+  gpu_index: 0
+  device: None
+
+  model_name: 'classic_mlp'  # 'ascad_cnn'  # ascad_cnn_block_anti_bn
+  ascad_cnn_block_anti_bn_dense_input: None
+  ascad_cnn_dense_input: None
+  batch_size: 400  # 500
+
+# pretrain
+pretrain:
+  train_num: 0
+
+  # network
+  epoch: 200
+  lr: 0.00001
+  wd: 0.0001
+
+  out_dim: 128
+  temperature: 0.07
+  n_views: 2
+
+  # data aug
+  augmentation:
+    data_filter: 1
+    data_shift: 15
+    data_cut: 50
+
+  # output
+  outfile: None
+
+tuning:
+  # data para
+  train_num: 35000 # 10000
+  out_dim: 9 # 256
+
+  # model para
+  pretrain_path: ''
+  model_eval: False
+  frozen: False
+  epoch: 100  # 150
+  lr: 0.00001
+  add_dense_bool: False
+
+  # GE para
+  GE_epoch: None
+  GE_run_time: 100
+  GE_every: 10
+
+  # output
+  outfile: None
+
