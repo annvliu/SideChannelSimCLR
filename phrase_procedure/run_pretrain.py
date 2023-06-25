@@ -9,7 +9,6 @@ from data_aug.dataset import ContrastiveLearningDataset
 from neural_net.change_net import add_projection_head
 from phrase_procedure.simclr import SimCLR
 from neural_net.choose_net import simclr_net
-from generalization_guarantee import calculate_dataset_info
 
 
 def pretrain_main(init_cfg):
