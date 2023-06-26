@@ -148,3 +148,19 @@ def change_GE(no, GE, GE_epoch):
     # 关闭连接
     cur.close()
     conn.close()
+
+
+def select_optimism_GE(no):
+    # 连接表
+    conn = sqlite3.connect('SimCLR_result.db')
+    cur = conn.cursor()
+
+    select_GE = "SELECT GE, GE_epoch FROM SimCLR_result where no = " + str(no)
+    cur.execute(select_GE)
+    result = cur.fetchall()[0]
+
+    # 关闭连接
+    cur.close()
+    conn.close()
+
+    return result

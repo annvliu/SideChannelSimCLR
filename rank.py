@@ -138,11 +138,20 @@ def GE_plot_multiprocess(probability, plain, config: dict):
     return GE
 
 
+def search_min(GE):
+    if np.min(GE) > 0:
+        return np.min(GE), None
+    else:
+        for trsnum, value in enumerate(GE):
+            if value == 0:
+                return 0, trsnum * 10
+
 def calculate_tuning_GE(no):
     path = select_path_from_no(no)
     cfg = load_config_data(path + 'config.yml')
 
     min_GE = 0x3F3F3F3F
+    min_trsnum = 0x3F3F3F3F
     min_GE_epoch = -1
     for GE_epoch in cfg['GE_epoch']:
         proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')
@@ -151,7 +160,13 @@ def calculate_tuning_GE(no):
         GE = GE_plot_multiprocess(proba, plain, cfg)
         np.save(path + 'GE_' + str(GE_epoch) + '.npy', GE)
 
-        if np.min(GE.mean(axis=0)) < min_GE:
-            min_GE = np.min(GE.mean(axis=0))
+        GE_ave = GE.mean(axis=0)
+        this_min_GE, this_trs_num = search_min(GE_ave)
+        if this_min_GE < min_GE:
+            min_GE = this_min_GE
             min_GE_epoch = GE_epoch
+        if this_min_GE == 0 and (min_trsnum is None or this_trs_num < min_trsnum):
+            min_trsnum = this_trs_num
+            min_GE_epoch = GE_epoch
+
     change_GE(no, min_GE, min_GE_epoch)
