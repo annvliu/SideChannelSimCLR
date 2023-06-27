@@ -151,7 +151,7 @@ def calculate_tuning_GE(no):
     cfg = load_config_data(path + 'config.yml')
 
     min_GE = 0x3F3F3F3F
-    min_trsnum = 0x3F3F3F3F
+    min_trsnum = None
     min_GE_epoch = -1
     for GE_epoch in cfg['GE_epoch']:
         proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')
