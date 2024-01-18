@@ -11,6 +11,17 @@ def get_data_info(dataset_name):
                                  'plain_fname': 'ascad_20k_plain.npy',
                                  'ascad_cnn_block_anti_bn_dense_input': 10752,
                                  'ascad_cnn_dense_input': 10752}
+    dataset_para['ascad_30k'] = {  # ?
+                                 'dataset_name': 'ascad_30k',
+                                 'feature_num': 700,
+                                 'leakage_model': 'ID',
+                                 'classification': 256,
+                                 'true_key': 0xe0,
+                                 'trs_fname': 'ascad_30k_trs.npy',
+                                 'label_fname': 'ascad_30k_label.npy',
+                                 'plain_fname': 'ascad_30k_plain.npy',
+                                 'ascad_cnn_block_anti_bn_dense_input': 10752,
+                                 'ascad_cnn_dense_input': 10752}
     dataset_para['EM'] = {  # filter = 1, shift = 5, cut = 5, 目前最好的是都用
                           'dataset_name': 'EM',
                           'feature_num': 90,
