@@ -12,7 +12,6 @@ from tqdm import tqdm
 
 from utils import save_config_file, accuracy
 from sqlite_command import insert_tuning
-from rank import GE_plot
 
 torch.manual_seed(0)
 

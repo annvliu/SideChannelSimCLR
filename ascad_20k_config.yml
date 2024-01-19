@@ -46,8 +46,8 @@ pretrain:
 
 tuning:
   # data para
-  train_num: 10000 # 35000
-  out_dim: 256 # 9
+  train_num: 10000
+  out_dim: 256
 
   # model para
   pretrain_path: ''

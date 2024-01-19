@@ -9,7 +9,6 @@ import torch
 
 from utils import save_config_file
 from sqlite_command import insert_network
-from rank import GE_plot
 
 
 class DeepLearning:
