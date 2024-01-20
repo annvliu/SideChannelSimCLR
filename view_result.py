@@ -8,8 +8,8 @@ from rank import search_min
 def view_tuning_network(experiment_no, change_GE_bool=False):
     path = select_path_from_no(experiment_no)
 
-    train_acc = np.load(path + 'train_acc.npy')
-    test_acc = np.load(path + 'test_acc.npy')
+    train_acc = np.load(path + 'tuning_train_acc.npy')
+    test_acc = np.load(path + 'tuning_test_acc.npy')
     print('max train acc', max(train_acc))
     plt.plot(train_acc, label='train')
     plt.plot(test_acc, label='test')
