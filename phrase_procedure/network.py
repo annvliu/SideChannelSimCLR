@@ -120,12 +120,8 @@ class DeepLearning:
                 correct += (predicted == target).sum().item()
 
         if epoch_counter + 1 in self.config['GE_epoch']:
-            GE_trs = GE_plot(predict_proba, cipher_GE, self.config)
-            np.save(self.config['outfile'] + 'GE_' + str(epoch_counter + 1) + '.npy', GE_trs)
-
-            if np.min(GE_trs.mean(axis=0)) < self.best_ave_GE:
-                self.best_ave_GE = np.min(GE_trs.mean(axis=0))
-                self.best_ave_GE_epoch = epoch_counter + 1
+            proba_plain = np.hstack((predict_proba, cipher_GE.reshape(-1, 1)))
+            np.save(self.config['outfile'] + 'proba_plain_' + str(epoch_counter + 1) + '.npy', proba_plain)
 
         print('Accuracy on test set: %f %% [%d/%d]' % (100 * correct / total, correct, total))
         return correct / total
