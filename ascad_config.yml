@@ -46,7 +46,7 @@ pretrain:
 
 tuning:
   # data para
-  train_num: 10000
+  train_num: 50000
   out_dim: 256
 
   # model para
