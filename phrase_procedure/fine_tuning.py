@@ -43,8 +43,8 @@ class FineTuning(object):
             'optimizer': self.optimizer.state_dict(),
         }, self.config['outfile'] + 'checkpoint.tar')
 
-        np.save(self.config['outfile'] + 'tuning_train_acc.npy', train_acc)
-        np.save(self.config['outfile'] + 'tuning_test_acc.npy', test_acc)
+        np.save(self.config['outfile'] + 'train_acc.npy', train_acc)
+        np.save(self.config['outfile'] + 'test_acc.npy', test_acc)
         np.save(self.config['outfile'] + 'train_loss_for_batch', self.train_loss)
         np.save(self.config['outfile'] + 'test_loss_for_batch', self.test_loss)
 
