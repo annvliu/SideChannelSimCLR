@@ -24,14 +24,14 @@ def view_tuning_network(experiment_no, change_GE_bool=False):
     for GE_epoch in cfg['GE_epoch']:
         GE = np.load(path + 'GE_' + str(GE_epoch) + '.npy')
         GE_ave = GE.mean(axis=0)
-        print(GE_epoch, min(GE_ave), np.argmin(GE_ave))
 
         for once in GE:
-            plt.plot([i * cfg['GE_every'] for i in range(GE_ave.shape)], once, c='gray')
-        plt.plot([i * cfg['GE_every'] for i in range(GE_ave.shape)], GE_ave, c='b')
+            plt.plot([i * cfg['GE_every'] for i in range(GE_ave.shape[0])], once, c='gray')
+        plt.plot([i * cfg['GE_every'] for i in range(GE_ave.shape[0])], GE_ave, c='b')
         plt.show()
 
         this_min_GE, this_trs_num = search_min(GE_ave, cfg['GE_every'])
+        print('epoch:', GE_epoch, 'GE:', this_min_GE, 'trs num:', this_trs_num)
         if this_min_GE < min_GE:
             min_GE = this_min_GE
             min_GE_epoch = GE_epoch
@@ -59,7 +59,7 @@ def view_pretrain(experiment_no):
 
 def main():
     # view_pretrain(17)
-    view_tuning_network(793)
+    view_tuning_network(794)
 
 
 if __name__ == '__main__':
