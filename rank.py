@@ -86,8 +86,8 @@ def compute_leakage(dataset_name, plain, key):
 #     return GE
 
 
-def once_GE(no, process_no, trs_num, key_proba, config, result):
-    for run_time in range(10):
+def once_GE(no, process_no, process_num, trs_num, key_proba, config, result):
+    for run_time in range(int(config['GE_run_time'] / process_num)):
         trs_random = np.arange(trs_num)
         np.random.seed(run_time * process_no)
         np.random.shuffle(trs_random)
@@ -95,7 +95,7 @@ def once_GE(no, process_no, trs_num, key_proba, config, result):
         this_run_GE = np.zeros(int(trs_num / config['GE_every']), dtype=float)
         for i in range(1, int(trs_num / config['GE_every']) + 1):
             if i % 100 == 0:
-                print("正在计算实验", no, "第", 10 * process_no + run_time, "次攻击", i * config['GE_every'], "条波形的GE")
+                print("正在计算实验", no, "第", process_num * process_no + run_time, "次攻击", i * config['GE_every'], "条波形的GE")
 
             tmp_id = trs_random[:i * config['GE_every']]
             tmp_proba = np.sum(key_proba[tmp_id], axis=0)
@@ -105,7 +105,7 @@ def once_GE(no, process_no, trs_num, key_proba, config, result):
         result.put(this_run_GE)
 
 
-def GE_plot_multiprocess(no, probability, plain, config: dict):
+def GE_plot_multiprocess(no, probability, plain, config: dict, process_num=10):
     trs_num = plain.shape[0]
 
     key_proba = np.zeros((trs_num, 256), dtype=float)
@@ -118,8 +118,8 @@ def GE_plot_multiprocess(no, probability, plain, config: dict):
 
     result = multiprocessing.Queue()
     process_list = []
-    for run_no in range(int(config['GE_run_time'] / 10)):
-        new_process = multiprocessing.Process(target=once_GE, args=(no, run_no, trs_num, key_proba, config, result))
+    for process_no in range(process_num):
+        new_process = multiprocessing.Process(target=once_GE, args=(no, process_no, process_num, trs_num, key_proba, config, result))
         process_list.append(new_process)
         new_process.start()
 
