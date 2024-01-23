@@ -1,3 +1,5 @@
+# filter = 1, shift = 15, cut = 50, 目前最好的是不用filter
+
 # common paras
 common:
   experiment_no: None
@@ -5,21 +7,22 @@ common:
 
   dataset_name: 'ascad_20k'
   init_data_folder: 'init_data/'
-  trs_fname: ''
-  label_fname: ''
-  plain_fname: ''
-  feature_num: None
-  leakage_model: None
-  classification: None
-  true_key: None
+  trs_fname: 'ascad_20k_trs.npy'
+  label_fname: 'ascad_20k_label.npy'
+  plain_fname: 'ascad_20k_plain.npy'
+
+  feature_num: 700
+  leakage_model: 'ID'
+  classification: 256
+  true_key: 224
 
   disable_cuda: False
   gpu_index: 0
   device: None
 
   model_name: 'ascad_cnn_block_anti_bn'  # ascad_cnn
-  ascad_cnn_block_anti_bn_dense_input: None
-  ascad_cnn_dense_input: None
+  ascad_cnn_block_anti_bn_dense_input: 10752
+  ascad_cnn_dense_input: 10752
   batch_size: 500  # 400
 
 # pretrain
