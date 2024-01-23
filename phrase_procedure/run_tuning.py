@@ -52,6 +52,8 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
     # https: // github.com / kakaobrain / torchlars
 
     optimizer = torch.optim.Adam(model.parameters(), cfg['lr'])
+    if 'optim' in cfg and cfg['optim'] == 'RMSprop':
+        optimizer = torch.optim.RMSprop(model.parameters(), cfg['lr'])
 
     #  It’s a no-op if the 'gpu_index' argument is a negative integer or None.
     experiment_no = None

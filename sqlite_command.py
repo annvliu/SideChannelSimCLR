@@ -11,15 +11,15 @@ def insert_pretrain(config):
                    "path text, pretrain_path text, dataset text, train_num number, model text, add_dense int, " \
                    "batch_size number, epoch number, lr number, out_dim number, shift number, cut number, " \
                    "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int, frozen int, " \
-                   "pretrain_train_num int)"
+                   "pretrain_train_num int, tuning_optim text)"
     cur.execute(create_table)
 
     # 插入数据
     data = (None, 'pretrain', config['outfile'], None, config['common']['dataset_name'], None,
             config['common']['model_name'], 0, config['common']['batch_size'], config['epoch'], config['lr'],
             config['out_dim'], config["augmentation"]['data_shift'], config["augmentation"]['data_cut'],
-            config["augmentation"]['data_filter'], None, None, None, None, None, config["train_num"])
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            config["augmentation"]['data_filter'], None, None, None, None, None, config["train_num"], None)
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 
@@ -51,8 +51,9 @@ def insert_tuning(config, best_GE, best_GE_epoch):
     data = (None, 'tuning', config['outfile'], config['pretrain_path'], config['common']['dataset_name'],
             config['train_num'], config['common']['model_name'], 1 if config['add_dense_bool'] else 0,
             config['common']['batch_size'], config['epoch'], config['lr'], config['out_dim'], None, None, None, best_GE,
-            best_GE_epoch, 1 if config['model_eval'] else 0, pretrain_no, 1 if config['frozen'] else 0, None)
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            best_GE_epoch, 1 if config['model_eval'] else 0, pretrain_no, 1 if config['frozen'] else 0, None,
+            config['optim'])
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 
@@ -78,15 +79,15 @@ def insert_network(config, best_GE, best_GE_epoch):
                    "path text, pretrain_path text, dataset text, train_num number, model text, add_dense int, " \
                    "batch_size number, epoch number, lr number, out_dim number, shift number, cut number, " \
                    "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int, frozen int, " \
-                   "pretrain_train_num int)"
+                   "pretrain_train_num int, tuning_optim text)"
     cur.execute(create_table)
 
     # 插入数据
     data = (None, 'network', config['outfile'], None, config['common']['dataset_name'], config['train_num'],
             config['common']['model_name'], 1 if config['add_dense_bool'] else 0, config['common']['batch_size'],
             config['epoch'], config['lr'], config['out_dim'], None, None, None, best_GE, best_GE_epoch,
-            1 if config['model_eval'] else 0, None, 1 if config['frozen'] else 0, None)
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            1 if config['model_eval'] else 0, None, 1 if config['frozen'] else 0, None, config['optim'])
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 

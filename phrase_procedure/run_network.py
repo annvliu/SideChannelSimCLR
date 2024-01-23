@@ -2,7 +2,6 @@ import numpy as np
 
 import torch
 from torch.utils.data import DataLoader
-import torch.optim as optim
 
 from utils import load_config_data, create_folder
 from data_aug.dataset import FineTuningDataset
@@ -33,7 +32,9 @@ def network_main(init_cfg, GE_list=None):
     cfg['out_dim'] = cfg['common']['classification']
     model = simclr_net(config=cfg)
 
-    optimizer = optim.Adam(model.parameters(), lr=cfg['lr'])
+    optimizer = torch.optim.Adam(model.parameters(), cfg['lr'])
+    if 'optim' in cfg and cfg['optim'] == 'RMSprop':
+        optimizer = torch.optim.RMSprop(model.parameters(), cfg['lr'])
 
     cnn = DeepLearning(model=model, optimizer=optimizer, config=cfg)
     return cnn.demo(train_loader, test_loader)
