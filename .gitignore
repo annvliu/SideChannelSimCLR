@@ -9,6 +9,7 @@ run_main4.py
 run_svm_rf.py
 run_GEtrsnum.py
 SimCLR_result.db
+view_result.py
 png/*
 runs/*
 init_data/*.npy
