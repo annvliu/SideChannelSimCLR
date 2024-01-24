@@ -16,7 +16,6 @@ common:
 
   disable_cuda: False
   gpu_index: 0
-  device: None
 
   model_name: 'ascad_cnn'  # 'ascad_cnn'  # ascad_cnn_block_anti_bn
   ascad_cnn_block_anti_bn_dense_input: 7680
