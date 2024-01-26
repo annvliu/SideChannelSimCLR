@@ -2,27 +2,6 @@ import torch.nn as nn
 import torch
 
 
-class twolayers_mlp(nn.Module):  # VGG
-    def __init__(self, out_dim, batch_size):
-        super(twolayers_mlp, self).__init__()
-
-        self.batch_size = batch_size
-
-        self.fc = nn.Sequential(
-            nn.Linear(1084, 128),
-            nn.ReLU(),
-        )
-        self.fc_end = nn.Linear(128, out_dim)
-
-    def forward(self, x):
-        out = x.to(torch.float32)
-        # out = out.view(x.size(0), -1)
-        # print(out.size())
-        out = self.fc(out)
-        out = self.fc_end(out)
-        return out
-
-
 class Classic_MLP(nn.Module):  # VGG
     def __init__(self, out_dim, point_num):
         super().__init__()
@@ -55,57 +34,6 @@ class Classic_MLP(nn.Module):  # VGG
         out = self.dense2(out)
         out = self.dense3(out)
         out = self.dense4(out)
-        out = self.fc_end(out)
-        return out
-
-
-class ches_model(nn.Module):  # VGG
-    def __init__(self, out_dim, batch_size):
-        super(ches_model, self).__init__()
-
-        self.batch_size = batch_size
-
-        self.avepool_cswap_arith_gv = nn.Sequential(
-            nn.AvgPool1d(kernel_size=4, stride=4)
-        )
-
-        self.bn_cswap_arith_gv = nn.Sequential(
-            nn.BatchNorm1d(271)
-        )
-
-        self.cnn_cswap_arith_gv = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=8, kernel_size=(20,), stride=(1,)),
-            nn.ReLU(),
-            nn.MaxPool1d(kernel_size=(2,), stride=(2,)),
-            nn.Conv1d(in_channels=8, out_channels=16, kernel_size=(20,), stride=(1,)),
-            nn.ReLU(),
-            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=(20,), stride=(1,)),
-            nn.ReLU()
-        )
-
-        self.fc_cswap_arith_gv = nn.Sequential(
-            nn.Dropout(0.5),
-            nn.Linear(2816, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-        )
-
-        self.fc_end = nn.Linear(128, out_dim)
-
-    def forward(self, x):
-        out = x.view(self.batch_size, 1, -1)
-        out = self.avepool_cswap_arith_gv(out)
-        out = out.view(self.batch_size, -1)
-        # print("shape after ave")
-        # print(out.shape)
-        out = out.to(torch.float32)
-        out = self.bn_cswap_arith_gv(out)
-        out = out.view(self.batch_size, 1, -1)
-        out = self.cnn_cswap_arith_gv(out)
-        out = out.view(x.size(0), -1)
-        # print("shape before fc")
-        # print(out.shape)
-        out = self.fc_cswap_arith_gv(out)
         out = self.fc_end(out)
         return out
 
@@ -231,6 +159,47 @@ class ascad_cnn_best_BN(nn.Module):
         return x
 
 
+class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Profiling Attacks
+    def __init__(self, out_dim, dense_input):
+        super(MECNN_N0, self).__init__()
+
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(1, 4, kernel_size=1, stride=1, padding=2),
+            nn.BatchNorm1d(4),
+            nn.SELU(),
+            nn.AvgPool1d(2)
+        )
+        self.fullc1 = nn.Sequential(
+            nn.Linear(dense_input, 10),
+            nn.SELU(),
+        )
+        self.fullc2 = nn.Sequential(
+            nn.Linear(10, 10),
+            nn.SELU(),
+        )
+        self.fc_end = nn.Linear(10, out_dim)
+
+        self.initialize()
+
+    def initialize(self):
+        for layers in self.modules():
+            if isinstance(layers, (nn.Conv1d, nn.Linear)):
+                nn.init.kaiming_normal_(layers.weight)
+                nn.init.constant_(layers.bias, 0)
+
+    def forward(self, x):
+        batch_size = x.size(0)
+        x = x.to(torch.float32)
+        x = x.view(batch_size, 1, -1)
+
+        x = self.conv1(x)
+        x = x.view(batch_size, -1)
+        x = self.fullc1(x)
+        x = self.fullc2(x)
+        x = self.fc_end(x)
+        return x
+
+
 def simclr_net(config: dict):
     """ Choose model with model_type """
     net_dict = {"ascad_cnn_block_anti_bn": ascad_cnn_best(out_dim=config["out_dim"],
@@ -241,7 +210,9 @@ def simclr_net(config: dict):
                                                point_num=config['common']["feature_num"],
                                                dense_input=config['common']["ascad_cnn_dense_input"]),
                 "classic_mlp": Classic_MLP(out_dim=config["out_dim"],
-                                           point_num=config['common']["feature_num"])}
+                                           point_num=config['common']["feature_num"]),
+                "MECNN_N0": MECNN_N0(out_dim=config["out_dim"],
+                                     dense_input=config['common']["MECNN_N0_dense_input"])}
 
     model = net_dict[config['common']["model_name"]]
     return model
