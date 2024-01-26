@@ -70,7 +70,6 @@ class SimCLR(object):
 
         positives = similarity_matrix[positives_labels].view(positives_labels.shape[0], -1)
         negatives = similarity_matrix[negatives_labels].view(negatives_labels.shape[0], -1)
-        pdb.set_trace()
 
         logits = torch.cat([positives, negatives], dim=1)
         logits = logits / self.config['temperature']
