@@ -15,7 +15,7 @@ class DeepLearning:
     def __init__(self, *args, **kwargs):
 
         self.config = kwargs['config']
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:" + str(self.config['common']['gpu_index']) if torch.cuda.is_available() else "cpu")
         self.model = kwargs['model'].to(self.device)
         self.optimizer = kwargs['optimizer']
         self.criterion = torch.nn.CrossEntropyLoss().to(self.device)
