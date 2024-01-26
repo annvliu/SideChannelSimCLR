@@ -20,10 +20,10 @@ def pretrain_main(init_cfg):
 
     # check if gpu training is available
     if not cfg['common']['disable_cuda'] and torch.cuda.is_available():
-        cfg['common']['device'] = torch.device("cuda:0")  # 增加device
+        cfg['common']['device'] = torch.device("cuda:" + str(cfg['common']['gpu_index']))  # 增加device
         cudnn.deterministic = True
         cudnn.benchmark = True
-        print("cuda!")
+        print("cuda!", cfg['common']['gpu_index'])
     else:
         cfg['common']['device'] = torch.device("cpu")
         cfg['common']['gpu_index'] = -1
