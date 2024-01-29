@@ -36,7 +36,7 @@ class Sbox:
 
 def compute_leakage(dataset_name, plain, key):
     sbox = Sbox()
-    if dataset_name.startswith('ascad'):
+    if 'ascad' in dataset_name:
         return sbox.s_box(int(plain) ^ int(key))
 
     elif dataset_name.startswith('EM'):
