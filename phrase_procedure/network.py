@@ -18,6 +18,7 @@ class DeepLearning:
         self.device = torch.device("cuda:" + str(self.config['common']['gpu_index']) if torch.cuda.is_available() else "cpu")
         self.model = kwargs['model'].to(self.device)
         self.optimizer = kwargs['optimizer']
+        self.scheduler = kwargs['scheduler']
         self.criterion = torch.nn.CrossEntropyLoss().to(self.device)
 
         self.best_ave_GE = 0x3f3f3f3f3f
@@ -83,6 +84,8 @@ class DeepLearning:
             loss = self.criterion(outputs, target)
             loss.backward()
             self.optimizer.step()
+            if self.scheduler is not None:
+                self.scheduler.step()
 
             _, predicted = torch.max(outputs.data, dim=1)
             running_loss += loss.item()

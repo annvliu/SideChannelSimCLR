@@ -56,6 +56,7 @@ tuning:
   add_dense_bool: False
 
   optim: 'Adam'
+  scheduler: 'OneCycleLR'  # None
   epoch: 150  # 50
   lr: 0.00001
 

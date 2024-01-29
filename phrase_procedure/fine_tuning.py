@@ -21,6 +21,7 @@ class FineTuning(object):
         self.config = kwargs['args']
         self.model = kwargs['model'].to(self.config['common']['device'])
         self.optimizer = kwargs['optimizer']
+        self.scheduler = kwargs['scheduler']
         self.criterion = torch.nn.CrossEntropyLoss().to(self.config['common']['device'])
 
         self.test_loss = []
@@ -119,6 +120,8 @@ class FineTuning(object):
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
+            if self.scheduler is not None:
+                self.scheduler.step()
 
             self.train_loss.append(loss.item())
 

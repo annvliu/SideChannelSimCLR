@@ -55,6 +55,12 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
     if 'optim' in cfg and cfg['optim'] == 'RMSprop':
         optimizer = torch.optim.RMSprop(model.parameters(), cfg['lr'])
 
+    scheduler = None
+    if 'scheduler' in cfg and cfg['scheduler'] == 'OneCycleLR':
+        scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
+                                                        steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
+                                                        final_div_factor=4, verbose=False)
+
     #  It’s a no-op if the 'gpu_index' argument is a negative integer or None.
     experiment_no = None
     with torch.cuda.device(cfg['common']['gpu_index']):
