@@ -28,6 +28,7 @@ class DeepLearning:
 
         train_acc = np.empty(self.config['epoch'], dtype=float)
         test_acc = np.empty(self.config['epoch'], dtype=float)
+        self.lr_batch = []
 
         begin_time = time.time()
 
@@ -51,6 +52,7 @@ class DeepLearning:
 
         np.save(self.config['outfile'] + 'test_acc.npy', test_acc)
         np.save(self.config['outfile'] + 'train_acc.npy', train_acc)
+        np.save(self.config['outfile'] + 'lr_batch.npy', np.asarray(self.lr_batch))
 
         torch.save({
             'epoch': self.config['epoch'],
@@ -83,6 +85,9 @@ class DeepLearning:
             self.optimizer.zero_grad()
             loss = self.criterion(outputs, target)
             loss.backward()
+
+            self.lr_batch.append(self.optimizer.state_dict()['param_groups'][0]['lr'])
+
             self.optimizer.step()
             if self.scheduler is not None:
                 self.scheduler.step()
