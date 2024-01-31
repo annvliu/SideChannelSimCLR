@@ -164,20 +164,37 @@ class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pro
         super(MECNN_N0, self).__init__()
 
         self.conv1 = nn.Sequential(
-            nn.Conv1d(1, 4, kernel_size=1, stride=1, padding=2),
-            nn.BatchNorm1d(4),
+            nn.Conv1d(1, 32, kernel_size=1, stride=1, padding=0),
+            nn.BatchNorm1d(32),
             nn.SELU(),
             nn.AvgPool1d(2)
         )
+        self.conv2 = nn.Sequential(
+            nn.Conv1d(32, 64, kernel_size=50, stride=1, padding=25),
+            nn.BatchNorm1d(64),
+            nn.SELU(),
+            nn.AvgPool1d(50)
+        )
+        self.conv3 = nn.Sequential(
+            nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm1d(128),
+            nn.SELU(),
+            nn.AvgPool1d(2)
+        )
+
         self.fullc1 = nn.Sequential(
-            nn.Linear(dense_input, 10),
+            nn.Linear(dense_input, 20),
             nn.SELU(),
         )
         self.fullc2 = nn.Sequential(
-            nn.Linear(10, 10),
+            nn.Linear(20, 20),
             nn.SELU(),
         )
-        self.fc_end = nn.Linear(10, out_dim)
+        self.fullc3 = nn.Sequential(
+            nn.Linear(20, 20),
+            nn.SELU(),
+        )
+        self.fc_end = nn.Linear(20, out_dim)
 
         self.initialize()
 
@@ -193,9 +210,12 @@ class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pro
         x = x.view(batch_size, 1, -1)
 
         x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
         x = x.view(batch_size, -1)
         x = self.fullc1(x)
         x = self.fullc2(x)
+        x = self.fullc3(x)
         x = self.fc_end(x)
         return x
 

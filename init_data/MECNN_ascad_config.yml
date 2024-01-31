@@ -19,7 +19,7 @@ common:
   model_name: 'MECNN_N0'  # ascad_cnn
   ascad_cnn_block_anti_bn_dense_input: 10752
   ascad_cnn_dense_input: 10752
-  MECNN_N0_dense_input: 1408
+  MECNN_N0_dense_input: 384
   batch_size: 50
 
 # pretrain
@@ -57,8 +57,8 @@ tuning:
 
   optim: 'Adam'
   scheduler: 'OneCycleLR'  # None
-  epoch: 150  # 50
-  lr: 0.00001
+  epoch: 400  # 150
+  lr: 0.01 #  0.005 # 0.00001
 
   # GE para
   GE_epoch: None
