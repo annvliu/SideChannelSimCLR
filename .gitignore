@@ -15,3 +15,4 @@ runs/*
 init_data/*.npy
 init_data/*.png
 init_data/test.py
+/run_main5.py
