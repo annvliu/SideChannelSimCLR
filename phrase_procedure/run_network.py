@@ -1,7 +1,6 @@
 import numpy as np
-
 import torch
-from torch.utils.data import DataLoader
+import torch.backends.cudnn as cudnn
 
 from utils import load_config_data, create_folder
 from data_aug.dataset import FineTuningDataset
@@ -20,6 +19,17 @@ def network_main(init_cfg, GE_list=None):
     cfg['GE_epoch'] = GE_list
     cfg['GE_epoch'].append(cfg['epoch'])
     cfg['outfile'] = create_folder()
+    cfg['out_dim'] = cfg['common']['classification']
+
+    # check if gpu training is available
+    if not cfg['common']['disable_cuda'] and torch.cuda.is_available():
+        cfg['common']['device'] = "cuda:" + str(cfg['common']['gpu_index'])
+        # cudnn.deterministic = True
+        # cudnn.benchmark = True
+        print(cfg['common']['device'])
+    else:
+        cfg['common']['device'] = "cpu"
+        cfg['common']['gpu_index'] = -1
 
     dataset = FineTuningDataset(cfg)
     train_dataset, test_dataset = dataset.get_dataset(train_num=cfg['train_num'])
@@ -29,7 +39,6 @@ def network_main(init_cfg, GE_list=None):
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
                                               pin_memory=True, drop_last=True)
 
-    cfg['out_dim'] = cfg['common']['classification']
     model = simclr_net(config=cfg)
 
     optimizer = torch.optim.Adam(model.parameters(), cfg['lr'])

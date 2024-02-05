@@ -1,8 +1,5 @@
-# from torchlars import LARS
-import argparse
 import torch
 import torch.backends.cudnn as cudnn
-from torchvision import models
 
 from data_aug.dataset import FineTuningDataset
 from neural_net.change_net import copy_model_for_classification
@@ -25,12 +22,12 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
 
     # check if gpu training is available
     if not cfg['common']['disable_cuda'] and torch.cuda.is_available():
-        cfg['common']['device'] = torch.device("cuda:" + str(cfg['common']['gpu_index']))  # 增加device
+        cfg['common']['device'] = "cuda:" + str(cfg['common']['gpu_index'])
         cudnn.deterministic = True
         cudnn.benchmark = True
-        print("cuda!", cfg['common']['gpu_index'])
+        print(cfg['common']['device'])
     else:
-        cfg['common']['device'] = torch.device("cpu")
+        cfg['common']['device'] = "cpu"
         cfg['common']['gpu_index'] = -1
 
     dataset = FineTuningDataset(cfg)
@@ -45,12 +42,6 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
     model = simclr_net(config=cfg)
     model = copy_model_for_classification(model, cfg['pretrain_path'], frozen=cfg['frozen'], add_dense=cfg['add_dense_bool'])
 
-    # optimizer = LARS(
-    #     torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), args.lr, weight_decay=args.weight_decay)
-    #     )
-    # https://pythonawesome.com/a-lars-implementation-in-pytorch/
-    # https: // github.com / kakaobrain / torchlars
-
     optimizer = torch.optim.Adam(model.parameters(), cfg['lr'])
     if 'optim' in cfg and cfg['optim'] == 'RMSprop':
         optimizer = torch.optim.RMSprop(model.parameters(), cfg['lr'])
@@ -61,9 +52,5 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
                                                         steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
                                                         final_div_factor=4, verbose=False)
 
-    #  It’s a no-op if the 'gpu_index' argument is a negative integer or None.
-    experiment_no = None
-    with torch.cuda.device(cfg['common']['gpu_index']):
-        finetuing = FineTuning(model=model, optimizer=optimizer, args=cfg)
-        experiment_no = finetuing.demo(train_loader, test_loader)
-    return experiment_no
+    finetuing = FineTuning(model=model, optimizer=optimizer, scheduler=scheduler, args=cfg)
+    return finetuing.demo(train_loader, test_loader)
