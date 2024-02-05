@@ -16,10 +16,11 @@ common:
   disable_cuda: False
   gpu_index: 0
 
-  model_name: 'MECNN_N0'  # ascad_cnn
+  model_name: 'MECNN_N0'
   ascad_cnn_block_anti_bn_dense_input: 10752
   ascad_cnn_dense_input: 10752
-  MECNN_N0_dense_input: 384
+#  MECNN_N100_dense_input: 384
+  MECNN_N0_dense_input: 7000
   batch_size: 50
 
 # pretrain
@@ -58,7 +59,7 @@ tuning:
   optim: 'Adam'
   scheduler: 'OneCycleLR'  # None
   epoch: 400  # 150
-  lr: 0.01 #  0.005 # 0.00001
+  lr: 0.005 #  0.001 # 0.00001
 
   # GE para
   GE_epoch: None

@@ -48,9 +48,16 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
 
     scheduler = None
     if 'scheduler' in cfg and cfg['scheduler'] == 'OneCycleLR':
+        # optimal ascad config
+        # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
+        #                                                 steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
+        #                                                 final_div_factor=4, verbose=False)
+
+        # MECNN config
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
                                                         steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
-                                                        final_div_factor=4, verbose=False)
+                                                        pct_start=0.4, anneal_strategy='linear', div_factor=10,
+                                                        final_div_factor=100)
 
     finetuing = FineTuning(model=model, optimizer=optimizer, scheduler=scheduler, args=cfg)
     return finetuing.demo(train_loader, test_loader)
