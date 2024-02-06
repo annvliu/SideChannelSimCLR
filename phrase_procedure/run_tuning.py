@@ -57,7 +57,7 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
                                                         steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
                                                         pct_start=0.4, anneal_strategy='linear', div_factor=10,
-                                                        final_div_factor=100)
+                                                        final_div_factor=100, three_phase=True)
 
     finetuing = FineTuning(model=model, optimizer=optimizer, scheduler=scheduler, args=cfg)
     return finetuing.demo(train_loader, test_loader)

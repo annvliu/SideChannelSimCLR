@@ -56,7 +56,7 @@ def network_main(init_cfg, GE_list=None):
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
                                                         steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
                                                         pct_start=0.4, anneal_strategy='linear', div_factor=10,
-                                                        final_div_factor=100)
+                                                        final_div_factor=100, three_phase=True)
 
     cnn = DeepLearning(model=model, optimizer=optimizer, scheduler=scheduler, config=cfg)
     return cnn.demo(train_loader, test_loader)
