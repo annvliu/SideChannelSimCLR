@@ -54,9 +54,9 @@ class cnn_block(nn.Module):
         return y
 
 
-class ascad_cnn_best(nn.Module):
+class ascad_cnn(nn.Module):
     def __init__(self, out_dim, point_num):
-        super(ascad_cnn_best, self).__init__()
+        super(ascad_cnn, self).__init__()
 
         self.bn = nn.Sequential(
             nn.BatchNorm1d(point_num)
@@ -115,9 +115,9 @@ class cnn_block_BN(nn.Module):
         return y
 
 
-class ascad_cnn_best_BN(nn.Module):
+class ascad_cnn_BN(nn.Module):
     def __init__(self, out_dim, point_num):
-        super(ascad_cnn_best_BN, self).__init__()
+        super(ascad_cnn_BN, self).__init__()
 
         self.bn = nn.Sequential(
             nn.BatchNorm1d(point_num)
@@ -297,10 +297,10 @@ class RMECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pr
 
 def simclr_net(config: dict):
     """ Choose model with model_type """
-    net_dict = {"ascad_cnn_block_anti_bn": ascad_cnn_best(out_dim=config["out_dim"],
-                                                          point_num=config['common']["feature_num"]),
-                "ascad_cnn": ascad_cnn_best_BN(out_dim=config["out_dim"],
-                                               point_num=config['common']["feature_num"]),
+    net_dict = {"ascad_cnn": ascad_cnn(out_dim=config["out_dim"],
+                                       point_num=config['common']["feature_num"]),
+                "ascad_cnn_bn": ascad_cnn_BN(out_dim=config["out_dim"],
+                                             point_num=config['common']["feature_num"]),
                 "classic_mlp": Classic_MLP(out_dim=config["out_dim"],
                                            point_num=config['common']["feature_num"]),
                 "MECNN_N100": MECNN_N100(out_dim=config["out_dim"],
