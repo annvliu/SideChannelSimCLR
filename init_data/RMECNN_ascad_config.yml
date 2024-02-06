@@ -1,0 +1,72 @@
+# common paras
+common:
+  experiment_no: None
+  experiment_type: 'pretrain'
+
+  dataset_name: 'RMECNN_ascad'
+  init_data_folder: 'init_data/'
+  trs_fname: 'RMECNN_ascad_scale_trs.npy'
+  label_fname: 'ascad_label.npy'
+  plain_fname: 'ascad_plain.npy'
+  feature_num: 700
+  leakage_model: 'ID'
+  classification: 256
+  true_key: 224
+
+  disable_cuda: False
+  gpu_index: 0
+
+  model_name: 'RMECNN_N0'
+  ascad_cnn_block_anti_bn_dense_input: 10752
+  ascad_cnn_dense_input: 10752
+  MECNN_N100_dense_input: 384
+  MECNN_N0_dense_input: 1408
+  RMECNN_N0_dense_input: 350
+  batch_size: 50
+
+# pretrain
+pretrain:
+  train_num: 0
+
+  # network
+  epoch: 200
+  lr: 0.00001
+  wd: 0.0001
+
+  out_dim: 128
+  temperature: 0.07
+  n_views: 2
+
+  # data aug
+  augmentation:
+    data_filter: 1
+    data_shift: 15
+    data_cut: 50
+
+  # output
+  outfile: None
+
+tuning:
+  # data para
+  train_num: 50000
+  out_dim: 256
+
+  # model para
+  pretrain_path: ''
+  model_eval: False
+  frozen: False
+  add_dense_bool: False
+
+  optim: 'Adam'
+  scheduler: 'OneCycleLR'  # None
+  epoch: 50  # 150  400 290
+  lr: 0.005 #  0.001 # 0.00001
+
+  # GE para
+  GE_epoch: None
+  GE_run_time: 100
+  GE_every: 10
+
+  # output
+  outfile: None
+

@@ -262,12 +262,37 @@ class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pro
         return x
 
 
+class RMECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Profiling Attacks
+    def __init__(self, out_dim, dense_input):
+        super(RMECNN_N0, self).__init__()
+
+        self.pool = nn.AvgPool1d(2)
+
+        self.fullc1 = nn.Sequential(
+            nn.Linear(dense_input, 10),
+            nn.SELU(),
+        )
+        self.fullc2 = nn.Sequential(
+            nn.Linear(10, 10),
+            nn.SELU(),
+        )
+        self.fc_end = nn.Linear(10, out_dim)
+
+    def forward(self, x):
+        x = x.to(torch.float32)
+
+        x = self.pool(x)
+        x = self.fullc1(x)
+        x = self.fullc2(x)
+        x = self.fc_end(x)
+        return x
+
+
 def simclr_net(config: dict):
     """ Choose model with model_type """
     net_dict = {"ascad_cnn_block_anti_bn": ascad_cnn_best(out_dim=config["out_dim"],
                                                           point_num=config['common']["feature_num"],
-                                                          dense_input=config['common'][
-                                                              "ascad_cnn_block_anti_bn_dense_input"]),
+                                                          dense_input=config['common']["ascad_cnn_block_anti_bn_dense_input"]),
                 "ascad_cnn": ascad_cnn_best_BN(out_dim=config["out_dim"],
                                                point_num=config['common']["feature_num"],
                                                dense_input=config['common']["ascad_cnn_dense_input"]),
@@ -276,7 +301,9 @@ def simclr_net(config: dict):
                 "MECNN_N100": MECNN_N100(out_dim=config["out_dim"],
                                          dense_input=config['common']["MECNN_N100_dense_input"]),
                 "MECNN_N0": MECNN_N0(out_dim=config["out_dim"],
-                                     dense_input=config['common']["MECNN_N0_dense_input"])}
+                                     dense_input=config['common']["MECNN_N0_dense_input"]),
+                "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"],
+                                       dense_input=config['common']["RMECNN_N0_dense_input"])}
 
     model = net_dict[config['common']["model_name"]]
     return model
