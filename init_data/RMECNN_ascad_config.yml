@@ -3,7 +3,7 @@ common:
   experiment_no: None
   experiment_type: 'pretrain'
 
-  dataset_name: 'RMECNN_ascad'
+  dataset_name: 'RMECNN_scale_ascad'
   init_data_folder: 'init_data/'
   trs_fname: 'RMECNN_ascad_scale_trs.npy'
   label_fname: 'ascad_label.npy'
@@ -17,11 +17,6 @@ common:
   gpu_index: 0
 
   model_name: 'RMECNN_N0'
-  ascad_cnn_block_anti_bn_dense_input: 10752
-  ascad_cnn_dense_input: 10752
-  MECNN_N100_dense_input: 384
-  MECNN_N0_dense_input: 1408
-  RMECNN_N0_dense_input: 350
   batch_size: 50
 
 # pretrain

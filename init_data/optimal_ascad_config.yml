@@ -17,10 +17,6 @@ common:
   gpu_index: 0
 
   model_name: 'MECNN_N100'
-  ascad_cnn_block_anti_bn_dense_input: 10752
-  ascad_cnn_dense_input: 10752
-  MECNN_N100_dense_input: 384
-#  MECNN_N0_dense_input: 384
   batch_size: 50
 
 # pretrain

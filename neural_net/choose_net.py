@@ -1,3 +1,5 @@
+import pdb
+
 import torch.nn as nn
 import torch
 
@@ -53,7 +55,7 @@ class cnn_block(nn.Module):
 
 
 class ascad_cnn_best(nn.Module):
-    def __init__(self, out_dim, point_num, dense_input):
+    def __init__(self, out_dim, point_num):
         super(ascad_cnn_best, self).__init__()
 
         self.bn = nn.Sequential(
@@ -67,7 +69,7 @@ class ascad_cnn_best(nn.Module):
         self.cnn5 = cnn_block(512, 512)
 
         self.fullc1 = nn.Sequential(
-            nn.Linear(dense_input, 4096),
+            nn.Linear(512 * int(point_num / 32), 4096),
             nn.ReLU(),
         )
         self.fullc2 = nn.Sequential(
@@ -114,7 +116,7 @@ class cnn_block_BN(nn.Module):
 
 
 class ascad_cnn_best_BN(nn.Module):
-    def __init__(self, out_dim, point_num, dense_input):
+    def __init__(self, out_dim, point_num):
         super(ascad_cnn_best_BN, self).__init__()
 
         self.bn = nn.Sequential(
@@ -128,7 +130,7 @@ class ascad_cnn_best_BN(nn.Module):
         self.cnn5 = cnn_block_BN(512, 512)
 
         self.fullc1 = nn.Sequential(
-            nn.Linear(dense_input, 4096),
+            nn.Linear(512 * int(point_num / 32), 4096),
             nn.ReLU(),
         )
         self.fullc2 = nn.Sequential(
@@ -160,7 +162,7 @@ class ascad_cnn_best_BN(nn.Module):
 
 
 class MECNN_N100(nn.Module):  # Methodology for Efficient CNN Architectures in Profiling Attacks
-    def __init__(self, out_dim, dense_input):
+    def __init__(self, out_dim, point_num):
         super(MECNN_N100, self).__init__()
 
         self.conv1 = nn.Sequential(
@@ -169,21 +171,26 @@ class MECNN_N100(nn.Module):  # Methodology for Efficient CNN Architectures in P
             nn.SELU(),
             nn.AvgPool1d(2)
         )
+        trs_len = int(point_num / 2)
+
         self.conv2 = nn.Sequential(
             nn.Conv1d(32, 64, kernel_size=50, stride=1, padding=25),
             nn.BatchNorm1d(64),
             nn.SELU(),
             nn.AvgPool1d(50)
         )
+        trs_len = int((trs_len + 1) / 50)
+
         self.conv3 = nn.Sequential(
             nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm1d(128),
             nn.SELU(),
             nn.AvgPool1d(2)
         )
+        trs_len = int(trs_len / 2)
 
         self.fullc1 = nn.Sequential(
-            nn.Linear(dense_input, 20),
+            nn.Linear(trs_len * 128, 20),
             nn.SELU(),
         )
         self.fullc2 = nn.Sequential(
@@ -221,18 +228,18 @@ class MECNN_N100(nn.Module):  # Methodology for Efficient CNN Architectures in P
 
 
 class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Profiling Attacks
-    def __init__(self, out_dim, dense_input):
+    def __init__(self, out_dim, point_num):
         super(MECNN_N0, self).__init__()
 
         self.conv1 = nn.Sequential(
-            nn.Conv1d(1, 4, kernel_size=1, stride=1, padding=2),
+            nn.Conv1d(1, 4, kernel_size=1, stride=1, padding=0),
             nn.SELU(),
             nn.BatchNorm1d(4),
             nn.AvgPool1d(2)
         )
 
         self.fullc1 = nn.Sequential(
-            nn.Linear(dense_input, 10),
+            nn.Linear(int(point_num / 2) * 4, 10),
             nn.SELU(),
         )
         self.fullc2 = nn.Sequential(
@@ -263,13 +270,13 @@ class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pro
 
 
 class RMECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Profiling Attacks
-    def __init__(self, out_dim, dense_input):
+    def __init__(self, out_dim, point_num):
         super(RMECNN_N0, self).__init__()
 
         self.pool = nn.AvgPool1d(2)
 
         self.fullc1 = nn.Sequential(
-            nn.Linear(dense_input, 10),
+            nn.Linear(int(point_num / 2), 10),
             nn.SELU(),
         )
         self.fullc2 = nn.Sequential(
@@ -291,19 +298,17 @@ class RMECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pr
 def simclr_net(config: dict):
     """ Choose model with model_type """
     net_dict = {"ascad_cnn_block_anti_bn": ascad_cnn_best(out_dim=config["out_dim"],
-                                                          point_num=config['common']["feature_num"],
-                                                          dense_input=config['common']["ascad_cnn_block_anti_bn_dense_input"]),
+                                                          point_num=config['common']["feature_num"]),
                 "ascad_cnn": ascad_cnn_best_BN(out_dim=config["out_dim"],
-                                               point_num=config['common']["feature_num"],
-                                               dense_input=config['common']["ascad_cnn_dense_input"]),
+                                               point_num=config['common']["feature_num"]),
                 "classic_mlp": Classic_MLP(out_dim=config["out_dim"],
                                            point_num=config['common']["feature_num"]),
                 "MECNN_N100": MECNN_N100(out_dim=config["out_dim"],
-                                         dense_input=config['common']["MECNN_N100_dense_input"]),
+                                         point_num=config['common']["feature_num"]),
                 "MECNN_N0": MECNN_N0(out_dim=config["out_dim"],
-                                     dense_input=config['common']["MECNN_N0_dense_input"]),
+                                     point_num=config['common']["feature_num"]),
                 "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"],
-                                       dense_input=config['common']["RMECNN_N0_dense_input"])}
+                                       point_num=config['common']["feature_num"])}
 
     model = net_dict[config['common']["model_name"]]
     return model
