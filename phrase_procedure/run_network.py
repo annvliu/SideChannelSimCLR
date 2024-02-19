@@ -17,7 +17,7 @@ def network_main(init_cfg, GE_list=None):
     cfg.update(init_cfg['tuning'])
 
     cfg['GE_epoch'] = GE_list
-    cfg['GE_epoch'].append(cfg['epoch'])
+    cfg['GE_epoch'].append(cfg['epoch']) if cfg['GE_epoch'][-1] != cfg['epoch'] else cfg['GE_epoch']
     cfg['outfile'] = create_folder()
     cfg['out_dim'] = cfg['common']['classification']
 

@@ -16,7 +16,7 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
 
     cfg['pretrain_path'] = pretrain_path
     cfg['GE_epoch'] = GE_list
-    cfg['GE_epoch'].append(cfg['epoch'])
+    cfg['GE_epoch'].append(cfg['epoch']) if cfg['GE_epoch'][-1] != cfg['epoch'] else cfg['GE_epoch']
     cfg['out_dim'] = cfg['common']['classification']
     cfg['outfile'] = create_folder()
 
@@ -36,8 +36,7 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
                                                pin_memory=True, drop_last=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
-                                              pin_memory=True,
-                                              drop_last=True)
+                                              pin_memory=True, drop_last=True)
 
     model = simclr_net(config=cfg)
     model = copy_model_for_classification(model, cfg['pretrain_path'], frozen=cfg['frozen'], add_dense=cfg['add_dense_bool'])
