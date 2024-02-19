@@ -35,8 +35,8 @@ pretrain:
   # data aug
   augmentation:
     data_filter: 1
-    data_shift: 15
-    data_cut: 50
+    data_shift: 5
+    data_cut: 5
 
   # output
   outfile: None
@@ -53,7 +53,7 @@ tuning:
   add_dense_bool: False
 
   optim: 'Adam'
-  scheduler: 'OneCycleLR'  # None
+  scheduler: 'MECNN OneCycleLR'  # None
   epoch: 50  # 150  400 290
   lr: 0.005 #  0.001 # 0.00001
 
