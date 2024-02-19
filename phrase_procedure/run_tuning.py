@@ -53,12 +53,14 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
         #                                                 final_div_factor=4, verbose=False)
 
         # MECNN config
+        print('MECNN OneCycleLR')
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
                                                         steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
                                                         pct_start=0.4, anneal_strategy='linear', div_factor=10,
                                                         final_div_factor=100, three_phase=True)
     elif 'scheduler' in cfg and cfg['scheduler'] == 'BilinearCNN OneCycleLR':
         # BilinearCNN config
+        print('BilinearCNN OneCycleLR')
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], steps_per_epoch=len(train_loader),
                                                         pct_start=0.2, anneal_strategy='linear', cycle_momentum=False,
                                                         epochs=cfg['epoch'], div_factor=10, verbose=False)
