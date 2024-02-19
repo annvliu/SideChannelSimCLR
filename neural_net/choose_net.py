@@ -323,6 +323,10 @@ class Bilinear_CNN(nn.Module):
 
     # how the network runs
     def forward(self, input):
+        batch_size = input.size(0)
+        input = input.to(torch.float32)
+        input = input.view(batch_size, 1, -1)
+
         x1 = self.features(input)
         x1 = x1.view(x1.size(0), -1)
         x1 = self.classifier_1(x1)
