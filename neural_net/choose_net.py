@@ -295,6 +295,44 @@ class RMECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pr
         return x
 
 
+class Bilinear_CNN(nn.Module):
+    def __init__(self, out_dim, point_num):
+        super(Bilinear_CNN, self).__init__()
+        # the encoder part
+        self.features = nn.Sequential(
+            nn.Conv1d(1, 4, kernel_size=1),
+            nn.SELU(),
+            nn.BatchNorm1d(4),
+            nn.AvgPool1d(kernel_size=2, stride=2),
+            nn.Flatten()
+        )
+        # the fully-connected layer 1
+        self.classifier_1 = nn.Sequential(
+            nn.Linear(int(point_num / 2) * 4, 10),
+            nn.SELU(),
+        )
+        # the fully-connected layer 2
+        self.classifier_2 = nn.Sequential(
+            nn.Linear(100, 10),
+            nn.SELU()
+        )
+        # the output layer
+        self.final_classifier = nn.Sequential(
+            nn.Linear(10, out_dim)
+        )
+
+    # how the network runs
+    def forward(self, input):
+        x1 = self.features(input)
+        x1 = x1.view(x1.size(0), -1)
+        x1 = self.classifier_1(x1)
+        x = torch.bmm(x1.unsqueeze(2), x1.unsqueeze(1))
+        x = x.view(-1, x1.size(1) ** 2)
+        x = self.classifier_2(x)
+        output = self.final_classifier(x)
+        return output
+
+
 def simclr_net(config: dict):
     """ Choose model with model_type """
     net_dict = {"ascad_cnn": ascad_cnn(out_dim=config["out_dim"],
@@ -308,7 +346,9 @@ def simclr_net(config: dict):
                 "MECNN_N0": MECNN_N0(out_dim=config["out_dim"],
                                      point_num=config['common']["feature_num"]),
                 "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"],
-                                       point_num=config['common']["feature_num"])}
+                                       point_num=config['common']["feature_num"]),
+                "Bilinear_CNN": Bilinear_CNN(out_dim=config["out_dim"],
+                                             point_num=config['common']["feature_num"])}
 
     model = net_dict[config['common']["model_name"]]
     return model
