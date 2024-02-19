@@ -119,6 +119,7 @@ def select_path_from_no(no):
 
     return path
 
+
 def select_tuning_from_pretrain(pretrain_no):
     # 连接表
     conn = sqlite3.connect('SimCLR_result.db')
