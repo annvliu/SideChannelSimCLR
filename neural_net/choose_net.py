@@ -331,7 +331,7 @@ class Bilinear_CNN(nn.Module):
         x = torch.bmm(x1.unsqueeze(2), x1.unsqueeze(1))
         x = x.view(-1, x1.size(1) ** 2)
         x = self.classifier_2(x)
-        output = self.final_classifier(x)
+        output = self.fc_end(x)
         return output
 
 
