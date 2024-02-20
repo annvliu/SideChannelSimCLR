@@ -317,9 +317,7 @@ class Bilinear_CNN(nn.Module):
             nn.SELU()
         )
         # the output layer
-        self.final_classifier = nn.Sequential(
-            nn.Linear(10, out_dim)
-        )
+        self.fc_end = nn.Linear(10, out_dim)
 
     # how the network runs
     def forward(self, input):
