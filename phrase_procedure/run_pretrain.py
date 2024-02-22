@@ -29,7 +29,6 @@ def pretrain_main(init_cfg):
         cfg['common']['gpu_index'] = -1
 
     dataset = ContrastiveLearningDataset(cfg)
-
     train_dataset = dataset.get_dataset(cfg['n_views'])
 
     dataset_copy = copy.deepcopy(train_dataset)
