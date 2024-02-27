@@ -2,6 +2,8 @@ import pdb
 
 import torch.nn as nn
 import torch
+import math
+import math
 
 
 class Classic_MLP(nn.Module):  # VGG
@@ -295,7 +297,7 @@ class RMECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pr
         return x
 
 
-class Bilinear_CNN(nn.Module):
+class Bilinear_CNN(nn.Module):  # Improving Deep Learning Based Second-Order Side-Channel Analysis With Bilinear CNN
     def __init__(self, out_dim, point_num):
         super(Bilinear_CNN, self).__init__()
         # the encoder part
@@ -320,12 +322,12 @@ class Bilinear_CNN(nn.Module):
         self.fc_end = nn.Linear(10, out_dim)
 
     # how the network runs
-    def forward(self, input):
-        batch_size = input.size(0)
-        input = input.to(torch.float32)
-        input = input.view(batch_size, 1, -1)
+    def forward(self, input_x):
+        batch_size = input_x.size(0)
+        input_x = input_x.to(torch.float32)
+        input_x = input_x.view(batch_size, 1, -1)
 
-        x1 = self.features(input)
+        x1 = self.features(input_x)
         x1 = x1.view(x1.size(0), -1)
         x1 = self.classifier_1(x1)
         x = torch.bmm(x1.unsqueeze(2), x1.unsqueeze(1))
@@ -335,22 +337,76 @@ class Bilinear_CNN(nn.Module):
         return output
 
 
+class EFS_CNN(nn.Module):  # Exploring Feature Selection Scenarios for Deep Learning-based Side-channel Analysis
+    # Best Convolutional Neural Network for ASCADf key dataset
+    # Number of points-of-interest: 700
+    # Leakage model: ID
+    # Number of parameters: 7776
+    def __init__(self, out_dim, point_num):
+        super(EFS_CNN, self).__init__()
+
+        conv_padding_dim, conv_output_dim = self.calculate_pool_padding_dim(point_num, 26, 13)
+        pool_padding_dim, pool_output_dim = self.calculate_pool_padding_dim(conv_output_dim, 2, 2)
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(1, 8, kernel_size=26, stride=13, padding=conv_padding_dim),
+            nn.SELU(),
+            nn.MaxPool1d(kernel_size=2, stride=2, padding=pool_padding_dim),
+            nn.BatchNorm1d(8),
+        )
+
+        conv_padding_dim, conv_output_dim = self.calculate_pool_padding_dim(pool_output_dim, 34, 17)
+        pool_padding_dim, pool_output_dim = self.calculate_pool_padding_dim(conv_output_dim, 2, 2)
+        self.conv2 = nn.Sequential(
+            nn.Conv1d(8, 16, kernel_size=34, stride=17, padding=conv_padding_dim),
+            nn.SELU(),
+            nn.MaxPool1d(kernel_size=2, stride=2, padding=pool_padding_dim),
+            nn.BatchNorm1d(16),
+            nn.Flatten(),
+        )
+
+        self.fullc1 = nn.Sequential(
+            nn.Linear(pool_output_dim * 16, 10),
+            nn.SELU(),
+        )
+        # the fully-connected layer 2
+        self.fullc2 = nn.Sequential(
+            nn.Linear(10, 10),
+            nn.SELU()
+        )
+        # the output layer
+        self.fc_end = nn.Linear(10, out_dim)
+
+    @staticmethod
+    def calculate_pool_padding_dim(data_size, kernel_size, stride):
+        output_dim = math.ceil(data_size / stride)
+        hope_data_dim = kernel_size + (output_dim - 1) * stride
+        padding_dim = math.ceil((hope_data_dim - data_size) / 2)
+        return padding_dim, output_dim
+
+    def forward(self, x):
+        batch_size = x.size(0)
+        x = x.to(torch.float32)
+        x = x.view(batch_size, 1, -1)
+
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = x.view(batch_size, -1)
+        x = self.fullc1(x)
+        x = self.fullc2(x)
+        x = self.fc_end(x)
+        return x
+
+
 def simclr_net(config: dict):
     """ Choose model with model_type """
-    net_dict = {"ascad_cnn": ascad_cnn(out_dim=config["out_dim"],
-                                       point_num=config['common']["feature_num"]),
-                "ascad_cnn_bn": ascad_cnn_BN(out_dim=config["out_dim"],
-                                             point_num=config['common']["feature_num"]),
-                "classic_mlp": Classic_MLP(out_dim=config["out_dim"],
-                                           point_num=config['common']["feature_num"]),
-                "MECNN_N100": MECNN_N100(out_dim=config["out_dim"],
-                                         point_num=config['common']["feature_num"]),
-                "MECNN_N0": MECNN_N0(out_dim=config["out_dim"],
-                                     point_num=config['common']["feature_num"]),
-                "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"],
-                                       point_num=config['common']["feature_num"]),
-                "Bilinear_CNN": Bilinear_CNN(out_dim=config["out_dim"],
-                                             point_num=config['common']["feature_num"])}
+    net_dict = {"ascad_cnn": ascad_cnn(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "ascad_cnn_bn": ascad_cnn_BN(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "classic_mlp": Classic_MLP(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "MECNN_N100": MECNN_N100(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "MECNN_N0": MECNN_N0(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "Bilinear_CNN": Bilinear_CNN(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "EFS_CNN": EFS_CNN(out_dim=config["out_dim"], point_num=config['common']["feature_num"])}
 
     model = net_dict[config['common']["model_name"]]
     return model
