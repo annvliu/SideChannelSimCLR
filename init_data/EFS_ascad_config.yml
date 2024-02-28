@@ -3,9 +3,9 @@ common:
   experiment_no: None
   experiment_type: 'pretrain'
 
-  dataset_name: 'ascad'
+  dataset_name: 'EFS_ascad'
   init_data_folder: 'init_data/'
-  trs_fname: 'ascad_trs.npy'
+  trs_fname: 'EFS_ascad_trs.npy'
   label_fname: 'ascad_label.npy'
   plain_fname: 'ascad_plain.npy'
   feature_num: 700
@@ -16,7 +16,7 @@ common:
   disable_cuda: False
   gpu_index: 0
 
-  model_name: 'EFS_CNN'  # ascad_cnn_bn
+  model_name: 'EFS_CNN'
   batch_size: 100
 
 # pretrain
