@@ -43,6 +43,7 @@ def network_main(init_cfg, GE_list=None):
 
     optimizer = torch.optim.Adam(model.parameters(), cfg['lr'])
     if 'optim' in cfg and cfg['optim'] == 'RMSprop':
+        print('optim RMSprop')
         optimizer = torch.optim.RMSprop(model.parameters(), cfg['lr'])
 
     scheduler = None
