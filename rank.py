@@ -54,36 +54,8 @@ def compute_leakage(dataset_name, plain, key):
                 HD_model = (HD_model - 1) / 2
         return res.count('1')
 
-
-# def GE_plot(probability, plain, config: dict):
-#     trs_num = plain.shape[0]
-#
-#     key_proba = np.zeros((trs_num, 256), dtype=float)
-#     log_softmax = torch.nn.LogSoftmax(dim=1)
-#     attack_proba = log_softmax(torch.from_numpy(probability))
-#     for j in range(trs_num):
-#         for candidate_key in range(256):
-#             key_proba[j][candidate_key] = attack_proba[j][
-#                 compute_leakage(config['common']['dataset_name'], plain[j], candidate_key)]
-#
-#     GE = []
-#     for run_no in range(config['GE_run_time']):
-#         trs_random = np.arange(trs_num)
-#         np.random.shuffle(trs_random)
-#
-#         this_run_GE = np.zeros(int(trs_num / config['GE_every']), dtype=float)
-#         for i in range(1, int(trs_num / config['GE_every']) + 1):
-#             if i % 100 == 0:
-#                 print("正在计算第", run_no, "次攻击", i * config['GE_every'], "条波形的GE")
-#
-#             tmp_id = trs_random[:i * config['GE_every']]
-#             tmp_proba = np.sum(key_proba[tmp_id], axis=0)
-#             rank = sum(tmp_proba > tmp_proba[config['common']['true_key']])
-#             this_run_GE[i - 1] = rank
-#         GE.append(this_run_GE)
-#
-#     GE = np.asarray(GE)
-#     return GE
+    elif 'AES_HD' in dataset_name:
+        return sbox.inverse_s_box(plain[1] ^ key) ^ plain[0]
 
 
 def once_GE(no, process_no, process_num, trs_num, key_proba, config, result):
