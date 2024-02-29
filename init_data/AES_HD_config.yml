@@ -1,0 +1,66 @@
+# common paras
+common:
+  experiment_no: None
+  experiment_type: 'pretrain'
+
+  dataset_name: 'AES_HD'
+  init_data_folder: 'init_data/'
+  trs_fname: 'AES_HD_trs.npy'
+  label_fname: 'AES_HD_label.npy'
+  plain_fname: 'AES_HD_cipher.npy'
+  feature_num: 1250
+  leakage_model: 'ID'
+  classification: 256
+  true_key: 0
+
+  disable_cuda: False
+  gpu_index: 0
+
+  model_name: 'ascad_cnn'
+  batch_size: 200
+
+# pretrain
+pretrain:
+  train_num: 0
+
+  # network
+  epoch: 200
+  lr: 0.00001
+  wd: 0.0001
+
+  out_dim: 128
+  temperature: 0.07
+  n_views: 2
+
+  # data aug
+  augmentation:
+    data_filter: 1
+    data_shift: 5
+    data_cut: 5
+
+  # output
+  outfile: None
+
+tuning:
+  # data para
+  train_num: 50000
+  out_dim: 256
+
+  # model para
+  pretrain_path: ''
+  model_eval: False
+  frozen: False
+  add_dense_bool: False
+
+  optim: 'RMSprop'
+  epoch: 150
+  lr: 0.00001
+
+  # GE para
+  GE_epoch: None
+  GE_run_time: 100
+  GE_every: 10
+
+  # output
+  outfile: None
+
