@@ -95,7 +95,8 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, result):
         this_run_GE = np.zeros(int(trs_num / config['GE_every']), dtype=float)
         for i in range(1, int(trs_num / config['GE_every']) + 1):
             if i % 100 == 0:
-                print("正在计算实验", no, "第", process_num * process_no + run_time, "次攻击", i * config['GE_every'], "条波形的GE")
+                print("正在计算实验", no, "第", process_num * process_no + run_time, "次攻击", i * config['GE_every'],
+                      "条波形的GE")
 
             tmp_id = trs_random[:i * config['GE_every']]
             tmp_proba = np.sum(key_proba[tmp_id], axis=0)
@@ -119,7 +120,8 @@ def GE_plot_multiprocess(no, probability, plain, config: dict, process_num=10):
     result = multiprocessing.Queue()
     process_list = []
     for process_no in range(process_num):
-        new_process = multiprocessing.Process(target=once_GE, args=(no, process_no, process_num, trs_num, key_proba, config, result))
+        new_process = multiprocessing.Process(target=once_GE,
+                                              args=(no, process_no, process_num, trs_num, key_proba, config, result))
         process_list.append(new_process)
         new_process.start()
 
@@ -139,11 +141,11 @@ def GE_plot_multiprocess(no, probability, plain, config: dict, process_num=10):
 
 
 def search_min(GE_trs, GE_every):
-    if np.min(GE_trs) >= 1:
+    if np.min(GE_trs) > 0:
         return np.min(GE_trs), None
     else:
         for trsnum, value in enumerate(GE_trs):
-            if value < 1:
+            if value == 0:
                 return 0, trsnum * GE_every
 
 
