@@ -1,4 +1,5 @@
 import os
+import pdb
 import time
 import socket
 import logging
@@ -97,9 +98,9 @@ class DeepLearning:
             all_labels = torch.empty(0, dtype=torch.int64).to(self.config['common']['device'])
 
             predict_proba = np.zeros((0, self.config['out_dim']), dtype=float)
-            cipher_GE = np.empty(0, dtype=int)
+            plain_GE = None
 
-            for inputs, target, cipher in tqdm(test_loader):
+            for inputs, target, plain in tqdm(test_loader):
 
                 inputs, target = inputs.to(self.device), target.to(self.device)
                 all_labels = torch.cat((all_labels, target), dim=0)
@@ -112,12 +113,13 @@ class DeepLearning:
 
                 if epoch_counter + 1 in self.config['GE_epoch']:
                     predict_proba = np.concatenate((predict_proba, outputs.cpu().detach().numpy()))
-                    cipher_GE = np.concatenate((cipher_GE, cipher.numpy()))
+                    plain_numpy = plain.numpy().reshape(self.config['common']['batch_size'], -1)
+                    plain_GE = np.vstack((plain_GE, plain_numpy)) if plain_GE is not None else plain_numpy
 
             topn = accuracy(all_outputs, all_labels, (1, 5))
 
             if epoch_counter + 1 in self.config['GE_epoch']:
-                proba_plain = np.hstack((predict_proba, cipher_GE.reshape(-1, 1)))
+                proba_plain = np.hstack((predict_proba, plain_GE))
                 np.save(self.config['outfile'] + 'proba_plain_' + str(epoch_counter + 1) + '.npy', proba_plain)
 
         return topn[0]

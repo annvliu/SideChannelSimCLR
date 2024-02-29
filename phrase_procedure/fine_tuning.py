@@ -71,7 +71,7 @@ class FineTuning(object):
             all_labels = torch.empty(0, dtype=torch.int64).to(self.device)
 
             predict_proba = np.zeros((0, self.config['out_dim']), dtype=float)
-            plain_GE = np.zeros(0, dtype=int)
+            plain_GE = None
 
             for images, labels, plain in tqdm(test_loader):
 
@@ -86,12 +86,13 @@ class FineTuning(object):
 
                 if epoch_counter + 1 in self.config['GE_epoch']:
                     predict_proba = np.concatenate((predict_proba, outputs.cpu().detach().numpy()))
-                    plain_GE = np.concatenate((plain_GE, plain.numpy()))
+                    plain_numpy = plain.numpy().reshape(self.config['common']['batch_size'], -1)
+                    plain_GE = np.vstack((plain_GE, plain_numpy)) if plain_GE is not None else plain_numpy
 
             topn = accuracy(all_outputs, all_labels, (1, 5))
 
             if epoch_counter + 1 in self.config['GE_epoch']:
-                proba_plain = np.hstack((predict_proba, plain_GE.reshape(-1, 1)))
+                proba_plain = np.hstack((predict_proba, plain_GE))
                 np.save(self.config['outfile'] + 'proba_plain_' + str(epoch_counter + 1) + '.npy', proba_plain)
 
         return topn[0]
