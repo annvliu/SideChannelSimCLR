@@ -16,8 +16,8 @@ common:
   disable_cuda: False
   gpu_index: 0
 
-  model_name: 'ascad_cnn'  # ascad_cnn_bn
-  batch_size: 200  # 500
+  model_name: 'ascad_cnn'
+  batch_size: 200
 
 # pretrain
 pretrain:
@@ -52,8 +52,8 @@ tuning:
   frozen: False
   add_dense_bool: False
 
-  optim: 'RMSprop' # Adam
-  epoch: 150  # 100
+  optim: 'RMSprop'
+  epoch: 150
   lr: 0.00001
 
   # GE para

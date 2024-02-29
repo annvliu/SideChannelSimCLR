@@ -54,8 +54,8 @@ tuning:
 
   optim: 'Adam'
   scheduler: 'MECNN OneCycleLR'  # None
-  epoch: 50  # 150
-  lr: 0.005 #  0.001 # 0.00001
+  epoch: 50
+  lr: 0.005
 
   # GE para
   GE_epoch: None
