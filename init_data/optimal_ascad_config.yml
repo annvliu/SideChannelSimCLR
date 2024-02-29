@@ -35,8 +35,8 @@ pretrain:
   # data aug
   augmentation:
     data_filter: 1
-    data_shift: 15
-    data_cut: 50
+    data_shift: 5
+    data_cut: 5
 
   # output
   outfile: None
