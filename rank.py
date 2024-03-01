@@ -132,8 +132,8 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
     epoch_list = cfg['GE_epoch'] if calculated_epoch_list is None else calculated_epoch_list
     for GE_epoch in epoch_list:
         proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')
-        proba = proba_plain[:, :-1]
-        plain = np.asarray(proba_plain[:, -1], dtype=int)
+        proba = proba_plain[:, :cfg['out_dim']]
+        plain = np.asarray(proba_plain[:, cfg['out_dim']:], dtype=int)
         GE = GE_plot_multiprocess(no, proba, plain, cfg)
         np.save(path + 'GE_' + str(GE_epoch) + '.npy', GE)
 
