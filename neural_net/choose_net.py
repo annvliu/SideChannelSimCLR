@@ -342,6 +342,14 @@ class RMECNN_N100(nn.Module):  # Revisiting a Methodology for Efficient CNN Arch
         )
         self.fc_end = nn.Linear(20, out_dim)
 
+        self.initialize()
+
+    def initialize(self):
+        for layers in self.modules():
+            if isinstance(layers, (nn.Conv1d, nn.Linear)):
+                nn.init.kaiming_normal_(layers.weight)
+                nn.init.constant_(layers.bias, 0)
+
     def forward(self, x):
         batch_size = x.size(0)
         x = x.to(torch.float32)
