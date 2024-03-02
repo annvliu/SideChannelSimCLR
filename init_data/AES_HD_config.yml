@@ -60,6 +60,7 @@ tuning:
   GE_epoch: None
   GE_run_time: 100
   GE_every: 10
+  GE_trsnum: 5000
 
   # output
   outfile: None
