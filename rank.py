@@ -37,12 +37,12 @@ class Sbox:
 def compute_leakage(dataset_name, plain, key):
     sbox = Sbox()
     if 'ascad' in dataset_name:
-        return sbox.s_box(int(plain) ^ int(key))
+        return sbox.s_box(int(plain[0]) ^ int(key))
 
     elif dataset_name.startswith('EM'):
-        sbox_output = plain ^ key
+        sbox_output = plain[0] ^ key
         sbox_input = sbox.inverse_s_box(sbox_output)
-        HD_model = plain ^ sbox_input
+        HD_model = plain[0] ^ sbox_input
 
         res = str('')
         while HD_model != 0:
