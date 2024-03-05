@@ -58,7 +58,7 @@ def compute_leakage(dataset_name, plain, key):
         return sbox.inverse_s_box(plain[1] ^ key) ^ plain[0]
 
 
-def once_GE(no, process_no, process_num, trs_num, key_proba, config, result):
+def once_GE(no, process_no, process_num, trs_num, key_proba, config, epoch, result):
     for run_time in range(int(config['GE_run_time'] / process_num)):
         trs_random = np.arange(trs_num)
         np.random.seed(run_time * process_no)
@@ -67,8 +67,8 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, result):
         this_run_GE = np.zeros(int(trs_num / config['GE_every']), dtype=float)
         for i in range(1, int(trs_num / config['GE_every']) + 1):
             if i % 100 == 0:
-                print("正在计算实验", no, "第", process_num * process_no + run_time, "次攻击", i * config['GE_every'],
-                      "条波形的GE")
+                print("正在计算实验", no, "epoch", epoch, "第", process_num * process_no + run_time, "次攻击",
+                      i * config['GE_every'], "条波形的GE")
 
             tmp_id = trs_random[:i * config['GE_every']]
             tmp_proba = np.sum(key_proba[tmp_id], axis=0)
@@ -78,7 +78,7 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, result):
         result.put(this_run_GE)
 
 
-def GE_plot_multiprocess(no, probability, plain, config: dict, process_num=10):
+def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_num=10):
     trs_num = plain.shape[0]
 
     key_proba = np.zeros((trs_num, 256), dtype=float)
@@ -93,7 +93,8 @@ def GE_plot_multiprocess(no, probability, plain, config: dict, process_num=10):
     process_list = []
     for process_no in range(process_num):
         new_process = multiprocessing.Process(target=once_GE,
-                                              args=(no, process_no, process_num, trs_num, key_proba, config, result))
+                                              args=(
+                                              no, process_no, process_num, trs_num, key_proba, config, epoch, result))
         process_list.append(new_process)
         new_process.start()
 
@@ -137,7 +138,7 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
 
         proba = proba_plain[:GE_trnum, :cfg['out_dim']]
         plain = np.asarray(proba_plain[:GE_trnum, cfg['out_dim']:], dtype=int)
-        GE = GE_plot_multiprocess(no, proba, plain, cfg)
+        GE = GE_plot_multiprocess(no, GE_epoch, proba, plain, cfg)
         np.save(path + 'GE_' + str(GE_epoch) + '.npy', GE)
 
         GE_ave = GE.mean(axis=0)
