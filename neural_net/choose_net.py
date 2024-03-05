@@ -210,7 +210,7 @@ class MECNN_N100(nn.Module):  # Methodology for Efficient CNN Architectures in P
     def initialize(self):
         for layers in self.modules():
             if isinstance(layers, (nn.Conv1d, nn.Linear)):
-                nn.init.kaiming_normal_(layers.weight)
+                nn.init.kaiming_uniform_(layers.weight)
                 nn.init.constant_(layers.bias, 0)
 
     def forward(self, x):
@@ -255,7 +255,7 @@ class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pro
     def initialize(self):
         for layers in self.modules():
             if isinstance(layers, (nn.Conv1d, nn.Linear)):
-                nn.init.kaiming_normal_(layers.weight)
+                nn.init.kaiming_uniform_(layers.weight)
                 nn.init.constant_(layers.bias, 0)
 
     def forward(self, x):
@@ -292,7 +292,7 @@ class RMECNN_N0(nn.Module):  # Revisiting a Methodology for Efficient CNN Archit
     def initialize(self):
         for layers in self.modules():
             if isinstance(layers, (nn.Conv1d, nn.Linear)):
-                nn.init.kaiming_normal_(layers.weight)
+                nn.init.kaiming_uniform_(layers.weight)
                 nn.init.constant_(layers.bias, 0)
 
     def forward(self, x):
@@ -347,7 +347,7 @@ class RMECNN_N100(nn.Module):  # Revisiting a Methodology for Efficient CNN Arch
     def initialize(self):
         for layers in self.modules():
             if isinstance(layers, (nn.Conv1d, nn.Linear)):
-                nn.init.kaiming_normal_(layers.weight)
+                nn.init.kaiming_uniform_(layers.weight)
                 nn.init.constant_(layers.bias, 0)
 
     def forward(self, x):
