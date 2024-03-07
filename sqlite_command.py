@@ -17,8 +17,10 @@ def insert_pretrain(config):
     # 插入数据
     data = (None, 'pretrain', config['outfile'], None, config['common']['dataset_name'], None,
             config['common']['model_name'], 0, config['common']['batch_size'], config['epoch'], config['lr'],
-            config['out_dim'], config["augmentation"]['data_shift'], config["augmentation"]['data_cut'],
-            config["augmentation"]['data_filter'], None, None, None, None, None, config["train_num"], None)
+            config['out_dim'], 'data_shift' in config["augmentation"] and config["augmentation"]['data_shift'],
+            'data_cut' in config["augmentation"] and config["augmentation"]['data_cut'],
+            'data_filter' in config["augmentation"] and config["augmentation"]['data_filter'], None, None, None, None,
+            None, config["train_num"], None)
     order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
