@@ -31,13 +31,9 @@ def network_main(init_cfg, GE_list=None):
         cfg['common']['device'] = "cpu"
         cfg['common']['gpu_index'] = -1
 
-    dataset = FineTuningDataset(cfg)
-    train_dataset, test_dataset = dataset.get_dataset(train_num=cfg['train_num'])
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
-                                               pin_memory=True, drop_last=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
-                                              pin_memory=True, drop_last=True)
+    network_datasets = FineTuningDataset(cfg)
+    network_dataloaders = [torch.utils.data.DataLoader(dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
+                                                       pin_memory=True, drop_last=True) for dataset in network_datasets]
 
     model = simclr_net(config=cfg)
 
@@ -67,4 +63,4 @@ def network_main(init_cfg, GE_list=None):
                                                         epochs=cfg['epoch'], div_factor=10, verbose=False)
 
     cnn = DeepLearning(model=model, optimizer=optimizer, scheduler=scheduler, config=cfg)
-    return cnn.demo(train_loader, test_loader)
+    return cnn.demo(network_dataloaders)

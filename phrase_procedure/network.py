@@ -30,7 +30,10 @@ class DeepLearning:
         self.best_ave_GE = 0x3f3f3f3f3f
         self.best_ave_GE_epoch = -1
 
-    def demo(self, train_loader, test_loader):
+    def demo(self, network_dataloaders):
+        train_loader = network_dataloaders[0]
+        test_loader = network_dataloaders[-1]
+        valid_loader = None if not self.valid_True else network_dataloaders[1]
 
         train_acc = np.empty(self.config['epoch'], dtype=float)
         test_acc = np.empty(self.config['epoch'], dtype=float)

@@ -38,6 +38,7 @@ class ContrastiveLearningDataset:
         if len(self.init_label.shape) > 1:                                       # official
             self.init_label = self.init_label[:, 1]
         self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
+        self.init_data = self.init_data.astype('float32')
 
         self.aug = config["augmentation"]
 
@@ -86,24 +87,20 @@ class LinearEvaluationDataset:
         return valid_datasets
 
 
-class FineTuningDataset:
-    def __init__(self, config):
-        self.init_data = np.load(config['common']['init_data_folder'] + config['common']['trs_fname'])
-        self.init_label = np.load(config['common']['init_data_folder'] + config['common']['label_fname'])  # seg_label
-        if len(self.init_label.shape) > 1:                                       # official
-            self.init_label = self.init_label[:, 1]
-        self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
+def FineTuningDataset(cfg):
+    init_data = np.load(cfg['common']['init_data_folder'] + cfg['common']['trs_fname'])
+    init_label = np.load(cfg['common']['init_data_folder'] + cfg['common']['label_fname'])
+    init_plain = np.load(cfg['common']['init_data_folder'] + cfg['common']['plain_fname'])
+    init_data = init_data.astype('float32')
 
-    def get_dataset(self, train_rate=0, train_num=0, randn=False):
-        row_random = np.arange(self.init_data.shape[0])
-        if randn:
-            np.random.shuffle(row_random)
-        train_num = int(self.init_data.shape[0] * train_rate) if train_rate != 0 else train_num
-        print("train num:", train_num)
-        train_datasets = NetDataset(self.init_data[row_random[:train_num]], self.init_label[row_random[:train_num]],
-                                    self.init_plain[row_random[:train_num]])
-        test_datasets = NetDataset(self.init_data[row_random[train_num:]], self.init_label[row_random[train_num:]],
-                                   self.init_plain[row_random[train_num:]])
+    train_num, valid_num = cfg['train_num'], 0 if 'valid_num' not in cfg else cfg['valid_num']
+    print("train num:", train_num, "valid num:", valid_num)
 
-        return train_datasets, test_datasets
+    network_datasets = [NetDataset(init_data[:train_num], init_label[:train_num], init_plain[:train_num])]   # train
+    network_datasets += [] if valid_num == 0 else [NetDataset(init_data[train_num:train_num + valid_num],  # train
+                                                              init_label[train_num:train_num + valid_num],
+                                                              init_plain[train_num:train_num + valid_num])]
+    network_datasets += [NetDataset(init_data[train_num + valid_num:], init_label[train_num + valid_num:],  # train
+                                    init_plain[train_num + valid_num:])]
+    return network_datasets
 
