@@ -3,9 +3,9 @@ common:
   experiment_no: None
   experiment_type: 'pretrain'
 
-  dataset_name: 'RMECNN_ascad_desync100'  # 'ascad_desync100'
+  dataset_name: 'ascad_desync100'
   init_data_folder: 'init_data/'
-  trs_fname: 'RMECNN_ascad_desync100_standard_trs.npy'  # 'ascad_desync100_trs.npy'
+  trs_fname: 'ascad_desync100_trs.npy'
   label_fname: 'ascad_label.npy'
   plain_fname: 'ascad_plain.npy'
   feature_num: 700
@@ -16,8 +16,8 @@ common:
   disable_cuda: False
   gpu_index: 0
 
-  model_name: 'RMECNN_N100'  # ascad_cnn
-  batch_size: 50  # 200
+  model_name: 'MECNN_N100'
+  batch_size: 256
 
 # pretrain
 pretrain:
@@ -52,16 +52,16 @@ tuning:
   frozen: False
   add_dense_bool: False
 
-  optim: 'Adam' # RMSprop
-  scheduler: 'MECNN OneCycleLR'  # None
-  epoch: 200  # 50
-  lr: 0.01 # 0.005
+  optim: 'Adam'
+  scheduler: 'MECNN OneCycleLR'
+  epoch: 50
+  lr: 0.01
 
   # GE para
   GE_epoch: None
   GE_run_time: 100
   GE_every: 10
-  GE_trsnum: 5000
+  GE_trsnum: 10000
 
   # output
   outfile: None
