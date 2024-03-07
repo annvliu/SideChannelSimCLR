@@ -271,6 +271,43 @@ class MECNN_N0(nn.Module):  # Methodology for Efficient CNN Architectures in Pro
         return x
 
 
+class MECNN_AES_HD(nn.Module):  # Methodology for Efficient CNN Architectures in Profiling Attacks
+    def __init__(self, out_dim, point_num):
+        super(MECNN_AES_HD, self).__init__()
+
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(1, 2, kernel_size=1, stride=1, padding=0),
+            nn.SELU(),
+            nn.BatchNorm1d(2),
+            nn.AvgPool1d(2)
+        )
+
+        self.fullc = nn.Sequential(
+            nn.Linear(int(point_num / 2) * 2, 2),
+            nn.SELU(),
+        )
+        self.fc_end = nn.Linear(2, out_dim)
+
+        self.initialize()
+
+    def initialize(self):
+        for layers in self.modules():
+            if isinstance(layers, (nn.Conv1d, nn.Linear)):
+                nn.init.kaiming_uniform_(layers.weight)
+                nn.init.constant_(layers.bias, 0)
+
+    def forward(self, x):
+        batch_size = x.size(0)
+        x = x.to(torch.float32)
+        x = x.view(batch_size, 1, -1)
+
+        x = self.conv1(x)
+        x = x.view(batch_size, -1)
+        x = self.fullc(x)
+        x = self.fc_end(x)
+        return x
+
+
 class RMECNN_N0(nn.Module):  # Revisiting a Methodology for Efficient CNN Architectures in Profiling Attacks
     def __init__(self, out_dim, point_num):
         super(RMECNN_N0, self).__init__()
