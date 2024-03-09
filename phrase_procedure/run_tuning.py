@@ -60,5 +60,5 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
                                                         pct_start=0.2, anneal_strategy='linear', cycle_momentum=False,
                                                         epochs=cfg['epoch'], div_factor=10, verbose=False)
 
-    finetuing = DeepLearning(model=model, optimizer=optimizer, scheduler=scheduler, args=cfg)
+    finetuing = DeepLearning(model=model, optimizer=optimizer, scheduler=scheduler, config=cfg)
     return finetuing.demo(network_dataloaders)
