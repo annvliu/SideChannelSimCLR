@@ -131,6 +131,7 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
     min_GE_epoch = -1
 
     epoch_list = cfg['GE_epoch'] if calculated_epoch_list is None else calculated_epoch_list
+    epoch_list = ['valid'] if 'valid_num' in cfg and cfg['valid_num'] != 0 else epoch_list
 
     for GE_epoch in epoch_list:
         proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')[:]
@@ -150,4 +151,5 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
             min_trsnum = this_trs_num
             min_GE_epoch = GE_epoch
 
-    change_GE(no, min_GE, min_GE_epoch)
+    if epoch_list != ['valid']:
+        change_GE(no, min_GE, min_GE_epoch)

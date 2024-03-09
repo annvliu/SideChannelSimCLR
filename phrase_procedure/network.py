@@ -23,6 +23,10 @@ class DeepLearning:
         self.scheduler = kwargs['scheduler']
         self.criterion = torch.nn.CrossEntropyLoss().to(self.device)
 
+        self.valid_loss = 0x3f3f3f3f3f
+        self.valid_True = 'valid_num' in self.config and self.config['valid_num'] != 0
+        print('valid: ', self.valid_True)
+
         self.test_loss = []
         self.train_loss = []
         self.lr_batch = []
@@ -39,13 +43,10 @@ class DeepLearning:
         test_acc = np.empty(self.config['epoch'], dtype=float)
         for epoch_counter in range(self.config['epoch']):
             train_acc[epoch_counter] = self.train(epoch_counter, train_loader)
-            test_acc[epoch_counter] = self.test(epoch_counter, test_loader)
-
-        torch.save({
-            'epoch': self.config['epoch'],
-            'state_dict': self.model.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
-        }, self.config['outfile'] + 'checkpoint.tar')
+            if self.valid_True:
+                self.valid(epoch_counter, valid_loader, test_loader)
+            else:
+                test_acc[epoch_counter] = self.test(epoch_counter, test_loader)
 
         np.save(self.config['outfile'] + 'test_acc.npy', test_acc)
         np.save(self.config['outfile'] + 'train_acc.npy', train_acc)
@@ -61,6 +62,20 @@ class DeepLearning:
         save_config_file(self.config['outfile'], self.config)
 
         return experiment_no
+
+    def valid(self, epoch_counter, valid_loader, test_loader):
+        with torch.no_grad():
+
+            valid_criterion = torch.nn.CrossEntropyLoss().to(self.device)
+            for inputs, target, plain in tqdm(valid_loader):
+                inputs, target = inputs.to(self.device), target.to(self.device)
+                outputs = self.model(inputs)
+                valid_loss = valid_criterion(outputs, target)
+
+            valid_loss /= len(valid_loader)
+            if valid_loss < self.valid_loss:
+                self.valid_loss = valid_loss
+                self.test(epoch_counter, test_loader, valid_test=True)
 
     def train(self, epoch_counter, train_loader):
         if self.config['model_eval']:
@@ -91,7 +106,7 @@ class DeepLearning:
 
         return top1[0]
 
-    def test(self, epoch_counter, test_loader):
+    def test(self, epoch_counter, test_loader, valid_test=False):
         if self.config['model_eval']:
             self.model.eval()
 
@@ -114,15 +129,23 @@ class DeepLearning:
 
                 self.test_loss.append(loss.item())
 
-                if epoch_counter + 1 in self.config['GE_epoch']:
+                if epoch_counter + 1 in self.config['GE_epoch'] or valid_test:
                     predict_proba = np.concatenate((predict_proba, outputs.cpu().detach().numpy()))
                     plain_numpy = plain.numpy().reshape(self.config['common']['batch_size'], -1)
                     plain_GE = np.vstack((plain_GE, plain_numpy)) if plain_GE is not None else plain_numpy
 
             topn = accuracy(all_outputs, all_labels, (1, 5))
 
-            if epoch_counter + 1 in self.config['GE_epoch']:
+            if epoch_counter + 1 in self.config['GE_epoch'] or valid_test:
                 proba_plain = np.hstack((predict_proba, plain_GE))
-                np.save(self.config['outfile'] + 'proba_plain_' + str(epoch_counter + 1) + '.npy', proba_plain)
+                fname = self.config['outfile'] + 'proba_plain_' + (str(epoch_counter + 1) if not valid_test else 'valid')
+                np.save(fname, proba_plain)
+
+            if epoch_counter + 1 == self.config['GE_epoch'] or valid_test:
+                torch.save({
+                    'epoch': epoch_counter + 1,
+                    'state_dict': self.model.state_dict(),
+                    'optimizer': self.optimizer.state_dict(),
+                }, self.config['outfile'] + 'checkpoint.tar')
 
         return topn[0]
