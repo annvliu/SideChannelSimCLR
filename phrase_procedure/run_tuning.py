@@ -4,7 +4,7 @@ import torch.backends.cudnn as cudnn
 from data_aug.dataset import FineTuningDataset
 from neural_net.change_net import copy_model_for_classification
 from neural_net.choose_net import simclr_net
-from phrase_procedure.fine_tuning import FineTuning
+from phrase_procedure.network import DeepLearning
 from utils import load_config_data, create_folder
 
 
@@ -66,5 +66,5 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
                                                         pct_start=0.2, anneal_strategy='linear', cycle_momentum=False,
                                                         epochs=cfg['epoch'], div_factor=10, verbose=False)
 
-    finetuing = FineTuning(model=model, optimizer=optimizer, scheduler=scheduler, args=cfg)
-    return finetuing.demo(train_loader, test_loader)
+    finetuing = DeepLearning(model=model, optimizer=optimizer, scheduler=scheduler, args=cfg)
+    return finetuing.demo(network_dataloaders)
