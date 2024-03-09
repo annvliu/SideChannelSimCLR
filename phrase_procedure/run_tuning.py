@@ -30,13 +30,9 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
         cfg['common']['device'] = "cpu"
         cfg['common']['gpu_index'] = -1
 
-    dataset = FineTuningDataset(cfg)
-    train_dataset, test_dataset = dataset.get_dataset(train_num=cfg['train_num'])
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
-                                               pin_memory=True, drop_last=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
-                                              pin_memory=True, drop_last=True)
+    network_datasets = FineTuningDataset(cfg)
+    network_dataloaders = [torch.utils.data.DataLoader(dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
+                                                       pin_memory=True, drop_last=True) for dataset in network_datasets]
 
     model = simclr_net(config=cfg)
     model = copy_model_for_classification(model, cfg['pretrain_path'], frozen=cfg['frozen'], add_dense=cfg['add_dense_bool'])
@@ -48,10 +44,6 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
 
     scheduler = None
     if 'scheduler' in cfg and cfg['scheduler'] == 'MECNN OneCycleLR':
-        # MECNN dataset, MECNN N100 model config
-        # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], epochs=cfg['epoch'],
-        #                                                 steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
-        #                                                 final_div_factor=4, verbose=False)
 
         # MECNN config
         print('MECNN OneCycleLR')
@@ -59,10 +51,12 @@ def tuning_main(init_cfg, pretrain_path, GE_list=None):
                                                         steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
                                                         pct_start=0.4, anneal_strategy='linear', div_factor=10,
                                                         final_div_factor=100, three_phase=True)
+
     elif 'scheduler' in cfg and cfg['scheduler'] == 'BilinearCNN OneCycleLR':
         # BilinearCNN config
         print('BilinearCNN OneCycleLR')
-        scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'], steps_per_epoch=len(train_loader),
+        scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=cfg['lr'],
+                                                        steps_per_epoch=cfg['train_num'] // cfg['common']['batch_size'],
                                                         pct_start=0.2, anneal_strategy='linear', cycle_momentum=False,
                                                         epochs=cfg['epoch'], div_factor=10, verbose=False)
 
