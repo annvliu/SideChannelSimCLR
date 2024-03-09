@@ -37,40 +37,6 @@ def insert_pretrain(config):
     return pretrain_no
 
 
-def insert_tuning(config, best_GE, best_GE_epoch):
-    # 连接数据库
-    conn = sqlite3.connect('SimCLR_result.db')
-    cur = conn.cursor()
-
-    if config['pretrain_path'] is None:
-        pretrain_no = None
-    else:
-        select_no = "SELECT no FROM SimCLR_result WHERE path = '" + config['pretrain_path'] + "'"
-        cur.execute(select_no)
-        pretrain_no = cur.fetchall()[0][0]
-
-    # 插入数据
-    data = (None, 'tuning', config['outfile'], config['pretrain_path'], config['common']['dataset_name'],
-            config['train_num'], config['common']['model_name'], 1 if config['add_dense_bool'] else 0,
-            config['common']['batch_size'], config['epoch'], config['lr'], config['out_dim'], None, None, None, best_GE,
-            best_GE_epoch, 1 if config['model_eval'] else 0, pretrain_no, 1 if config['frozen'] else 0, None,
-            config['optim'])
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-    conn.execute(order, data)
-    conn.commit()
-
-    # 获取no
-    select_no = "SELECT no FROM SimCLR_result WHERE path = '" + config['outfile'] + "'"
-    cur.execute(select_no)
-    tuning_no = cur.fetchall()[0][0]  # 获取查询结果一般可用.fetchone()方法（获取第一条），或者用.fetchall()方法（获取所有条）
-
-    # 关闭连接
-    cur.close()
-    conn.close()
-
-    return tuning_no
-
-
 def insert_network(config, best_GE, best_GE_epoch):
     # 连接数据库
     conn = sqlite3.connect('SimCLR_result.db')
@@ -85,10 +51,20 @@ def insert_network(config, best_GE, best_GE_epoch):
     cur.execute(create_table)
 
     # 插入数据
-    data = (None, 'network', config['outfile'], None, config['common']['dataset_name'], config['train_num'],
-            config['common']['model_name'], 1 if config['add_dense_bool'] else 0, config['common']['batch_size'],
-            config['epoch'], config['lr'], config['out_dim'], None, None, None, best_GE, best_GE_epoch,
-            1 if config['model_eval'] else 0, None, 1 if config['frozen'] else 0, None, config['optim'])
+    if config['pretrain_path'] is None or config['pretrain_path'] == '':
+        pretrain_no = None
+        config['pretrain_path'] = None
+    else:
+        select_no = "SELECT no FROM SimCLR_result WHERE path = '" + config['pretrain_path'] + "'"
+        cur.execute(select_no)
+        pretrain_no = cur.fetchall()[0][0]
+
+    # 插入数据
+    data = (None, config['common']['experiment_type'], config['outfile'], config['pretrain_path'],
+            config['common']['dataset_name'], config['train_num'], config['common']['model_name'],
+            1 if config['add_dense_bool'] else 0, config['common']['batch_size'], config['epoch'], config['lr'],
+            config['out_dim'], None, None, None, best_GE, best_GE_epoch, 1 if config['model_eval'] else 0,
+            pretrain_no, 1 if config['frozen'] else 0, None, config['optim'])
     order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
