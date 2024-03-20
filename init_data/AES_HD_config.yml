@@ -44,6 +44,7 @@ pretrain:
 tuning:
   # data para
   train_num: 50000
+  valid_num: 2560
   out_dim: 256
 
   # model para
@@ -60,7 +61,7 @@ tuning:
   GE_epoch: None
   GE_run_time: 100
   GE_every: 10
-  GE_trsnum: 5000
+  GE_trsnum: 2560
 
   # output
   outfile: None

@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from utils import save_config_file, accuracy
 from sqlite_command import insert_network
+from rank import GE_plot_multiprocess, search_min
 
 
 class DeepLearning:
@@ -23,7 +24,8 @@ class DeepLearning:
         self.scheduler = kwargs['scheduler']
         self.criterion = torch.nn.CrossEntropyLoss().to(self.device)
 
-        self.valid_loss = 0x3f3f3f3f3f
+        self.valid_GE = 0x3f3f3f3f3f
+        self.valid_trace_num = 0x3f3f3f3f3f
         self.valid_True = 'valid_num' in self.config and self.config['valid_num'] != 0
         print('valid: ', self.valid_True)
 
@@ -65,17 +67,29 @@ class DeepLearning:
 
     def valid(self, epoch_counter, valid_loader, test_loader):
         with torch.no_grad():
+            predict_proba = np.zeros((0, self.config['out_dim']), dtype=float)
+            all_plain = None
 
-            valid_criterion = torch.nn.CrossEntropyLoss().to(self.device)
             for inputs, target, plain in tqdm(valid_loader):
                 inputs, target = inputs.to(self.device), target.to(self.device)
                 outputs = self.model(inputs)
-                valid_loss = valid_criterion(outputs, target)
 
-            valid_loss /= len(valid_loader)
-            if valid_loss < self.valid_loss:
-                self.valid_loss = valid_loss
-                self.test(epoch_counter, test_loader, valid_test=True)
+                plain_numpy = plain.numpy().reshape(self.config['common']['batch_size'], -1)
+                all_plain = np.vstack((all_plain, plain_numpy)) if all_plain is not None else plain_numpy
+                predict_proba = np.concatenate((predict_proba, outputs.cpu().detach().numpy()))
+
+            GE = GE_plot_multiprocess(0, epoch=epoch_counter, probability=predict_proba, plain=all_plain, config=self.config)
+            GE_ave = GE.mean(axis=0)
+            this_min_GE, this_trs_num = search_min(GE_ave, self.config['GE_every'])
+
+            save_model = False
+            if this_min_GE < self.valid_GE:
+                self.valid_GE = this_min_GE
+                save_model = True
+            if this_min_GE == 0 and this_trs_num < self.valid_trace_num:
+                self.valid_trace_num = this_trs_num
+                save_model = True
+            _ = self.test(epoch_counter, test_loader, valid_test=True) if save_model else -1
 
     def train(self, epoch_counter, train_loader):
         if self.config['model_eval']:
