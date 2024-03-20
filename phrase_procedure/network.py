@@ -78,7 +78,7 @@ class DeepLearning:
                 all_plain = np.vstack((all_plain, plain_numpy)) if all_plain is not None else plain_numpy
                 predict_proba = np.concatenate((predict_proba, outputs.cpu().detach().numpy()))
 
-            GE = GE_plot_multiprocess(0, epoch=epoch_counter, probability=predict_proba, plain=all_plain, config=self.config)
+            GE = GE_plot_multiprocess(0, epoch=epoch_counter, probability=predict_proba, plain=all_plain.astype('int'), config=self.config)
             GE_ave = GE.mean(axis=0)
             this_min_GE, this_trs_num = search_min(GE_ave, self.config['GE_every'])
 
