@@ -54,7 +54,7 @@ tuning:
   add_dense_bool: False
 
   optim: 'Adam'
-  epoch: 150
+  epoch: 300
   lr: 0.001
 
   # GE para
