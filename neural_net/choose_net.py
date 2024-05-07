@@ -324,13 +324,13 @@ class RMECNN_N0(nn.Module):  # Revisiting a Methodology for Efficient CNN Archit
         )
         self.fc_end = nn.Linear(10, out_dim)
 
-        self.initialize()
-
-    def initialize(self):
-        for layers in self.modules():
-            if isinstance(layers, (nn.Conv1d, nn.Linear)):
-                nn.init.kaiming_uniform_(layers.weight)
-                nn.init.constant_(layers.bias, 0)
+    #     self.initialize()
+    #
+    # def initialize(self):
+    #     for layers in self.modules():
+    #         if isinstance(layers, (nn.Conv1d, nn.Linear)):
+    #             nn.init.kaiming_normal_(layers.weight)
+    #             nn.init.constant_(layers.bias, 0)
 
     def forward(self, x):
         x = x.to(torch.float32)
