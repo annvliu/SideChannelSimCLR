@@ -342,6 +342,69 @@ class RMECNN_N0(nn.Module):  # Revisiting a Methodology for Efficient CNN Archit
         return x
 
 
+class RMECNN_N100(nn.Module):  # Revisiting a Methodology for Efficient CNN Architectures in Profiling Attacks
+    def __init__(self, out_dim, point_num):
+        super(RMECNN_N100, self).__init__()
+
+        self.pool = nn.AvgPool1d(2)
+
+        self.conv1 = nn.Sequential(
+            nn.Conv1d(1, 64, kernel_size=50, stride=1, padding=25),
+            nn.SELU(),
+            nn.BatchNorm1d(64),
+            nn.AvgPool1d(50)
+        )
+        trs_len = int((point_num + 1) / 50)
+
+        self.conv2 = nn.Sequential(
+            nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.SELU(),
+            nn.BatchNorm1d(128),
+            nn.AvgPool1d(2)
+        )
+        trs_len = int(trs_len / 2)
+
+        self.fullc1 = nn.Sequential(
+            nn.Linear(trs_len * 128, 20),
+            nn.SELU(),
+        )
+        self.fullc2 = nn.Sequential(
+            nn.Linear(20, 20),
+            nn.SELU(),
+        )
+        self.fullc3 = nn.Sequential(
+            nn.Linear(20, 20),
+            nn.SELU(),
+        )
+        self.fc_end = nn.Linear(20, out_dim)
+
+        self.initialize()
+
+        self.initialize()
+
+    def initialize(self):
+        for layers in self.modules():
+            if isinstance(layers, (nn.Conv1d, nn.Linear)):
+                nn.init.kaiming_uniform_(layers.weight)
+                nn.init.constant_(layers.bias, 0)
+
+    def forward(self, x):
+        x = x.to(torch.float32)
+        batch_size = x.size(0)
+        x = self.pool(x)
+
+        x = x.view(batch_size, 1, -1)
+        x = self.conv1(x)
+        x = self.conv2(x)
+
+        x = x.view(batch_size, -1)
+        x = self.fullc1(x)
+        x = self.fullc2(x)
+        x = self.fullc3(x)
+        x = self.fc_end(x)
+        return x
+
+
 class Bilinear_CNN(nn.Module):  # Improving Deep Learning Based Second-Order Side-Channel Analysis With Bilinear CNN
     def __init__(self, out_dim, point_num):
         super(Bilinear_CNN, self).__init__()
@@ -391,6 +454,7 @@ def simclr_net(config: dict):
                 "MECNN_N100": MECNN_N100(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "MECNN_AES_HD": MECNN_AES_HD(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "RMECNN_N100": RMECNN_N100(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "Bilinear_CNN": Bilinear_CNN(out_dim=config["out_dim"], point_num=config['common']["feature_num"])}
 
     model = net_dict[config['common']["model_name"]]

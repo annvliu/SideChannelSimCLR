@@ -36,6 +36,7 @@ def network_main(init_cfg, GE_list=None):
                                                        pin_memory=True, drop_last=True) for dataset in network_datasets]
 
     model = simclr_net(config=cfg)
+    # total_num = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     optimizer = torch.optim.Adam(model.parameters(), cfg['lr'])
     if 'optim' in cfg and cfg['optim'] == 'RMSprop':
