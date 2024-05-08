@@ -347,6 +347,7 @@ class RMECNN_N100(nn.Module):  # Revisiting a Methodology for Efficient CNN Arch
         super(RMECNN_N100, self).__init__()
 
         self.pool = nn.AvgPool1d(2)
+        trs_len = int(point_num / 2)
 
         self.conv1 = nn.Sequential(
             nn.Conv1d(1, 64, kernel_size=50, stride=1, padding=25),
@@ -354,7 +355,7 @@ class RMECNN_N100(nn.Module):  # Revisiting a Methodology for Efficient CNN Arch
             nn.BatchNorm1d(64),
             nn.AvgPool1d(50)
         )
-        trs_len = int((point_num + 1) / 50)
+        trs_len = int((trs_len + 1) / 50)
 
         self.conv2 = nn.Sequential(
             nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1),
@@ -377,8 +378,6 @@ class RMECNN_N100(nn.Module):  # Revisiting a Methodology for Efficient CNN Arch
             nn.SELU(),
         )
         self.fc_end = nn.Linear(20, out_dim)
-
-        self.initialize()
 
         self.initialize()
 
