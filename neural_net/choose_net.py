@@ -443,6 +443,63 @@ class Bilinear_CNN(nn.Module):  # Improving Deep Learning Based Second-Order Sid
         output = self.fc_end(x)
         return output
 
+class Bilinear_CNN_N100(nn.Module):  # Improving Deep Learning Based Second-Order Side-Channel Analysis With Bilinear CNN
+    def __init__(self, out_dim, point_num):
+        super(Bilinear_CNN_N100, self).__init__()
+        # the encoder part
+        self.features1 = nn.Sequential(
+            nn.Conv1d(1, 32, kernel_size=1),
+            nn.SELU(),
+            nn.BatchNorm1d(32),
+            nn.AvgPool1d(kernel_size=2, stride=2),)
+
+        self.features2 = nn.Sequential(
+            nn.Conv1d(32, 64, kernel_size=50),
+            nn.SELU(),
+            nn.BatchNorm1d(64),
+            nn.AvgPool1d(kernel_size=50, stride=50))
+
+        self.features3 = nn.Sequential(
+            nn.Conv1d(64, 128, kernel_size=3),
+            nn.SELU(),
+            nn.BatchNorm1d(128),
+            nn.AvgPool1d(kernel_size=2, stride=2),
+            nn.Flatten())
+
+        trs_len = int(point_num / 2)
+        trs_len = int((trs_len - 49) / 50)
+        trs_len = int((trs_len - 2) / 2)
+
+        # the fully-connected layer 1
+        self.classifier_1 = nn.Sequential(
+            nn.Linear(trs_len * 128, 10),
+            nn.SELU(),
+        )
+        # the fully-connected layer 2
+        self.classifier_2 = nn.Sequential(
+            nn.Linear(100, 10),
+            nn.SELU()
+        )
+        # the output layer
+        self.fc_end = nn.Linear(10, out_dim)
+
+    # how the network runs
+    def forward(self, input_x):
+        batch_size = input_x.size(0)
+        input_x = input_x.to(torch.float32)
+        input_x = input_x.view(batch_size, 1, -1)
+
+        x1 = self.features1(input_x)
+        x1 = self.features2(x1)
+        x1 = self.features3(x1)
+        x1 = x1.view(x1.size(0), -1)
+        x1 = self.classifier_1(x1)
+        x = torch.bmm(x1.unsqueeze(2), x1.unsqueeze(1))
+        x = x.view(-1, x1.size(1) ** 2)
+        x = self.classifier_2(x)
+        output = self.fc_end(x)
+        return output
+
 
 def simclr_net(config: dict):
     """ Choose model with model_type """
@@ -454,7 +511,8 @@ def simclr_net(config: dict):
                 "MECNN_AES_HD": MECNN_AES_HD(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "RMECNN_N0": RMECNN_N0(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "RMECNN_N100": RMECNN_N100(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
-                "Bilinear_CNN": Bilinear_CNN(out_dim=config["out_dim"], point_num=config['common']["feature_num"])}
+                "Bilinear_CNN": Bilinear_CNN(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+                "Bilinear_CNN_N100": Bilinear_CNN_N100(out_dim=config["out_dim"], point_num=config['common']["feature_num"])}
 
     model = net_dict[config['common']["model_name"]]
     return model

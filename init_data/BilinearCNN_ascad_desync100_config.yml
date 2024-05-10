@@ -1,0 +1,67 @@
+# common paras
+common:
+  experiment_no: None
+  experiment_type: 'pretrain'
+
+  dataset_name: 'BilinearCNN_ascad'
+  init_data_folder: 'init_data/'
+  trs_fname: 'ascad_desync100_trs.npy'
+  label_fname: 'ascad_label.npy'
+  plain_fname: 'ascad_plain.npy'
+  feature_num: 700
+  leakage_model: 'ID'
+  classification: 256
+  true_key: 224
+
+  disable_cuda: False
+  gpu_index: 0
+
+  model_name: 'Bilinear_CNN_N100'
+  batch_size: 200
+
+# pretrain
+pretrain:
+  train_num: 0
+
+  # network
+  epoch: 200
+  lr: 0.00001
+  wd: 0.0001
+
+  out_dim: 128
+  temperature: 0.07
+  n_views: 2
+
+  # data aug
+  augmentation:
+    data_filter: 1
+    data_shift: 5
+    data_cut: 5
+
+  # output
+  outfile: None
+
+tuning:
+  # data para
+  train_num: 50000
+  out_dim: 256
+
+  # model para
+  pretrain_path: ''
+  model_eval: False
+  frozen: False
+  add_dense_bool: False
+
+  optim: 'Adam'
+  scheduler: 'BilinearCNN OneCycleLR'  # None
+  epoch: 50
+  lr: 0.005
+
+  # GE para
+  GE_epoch: None
+  GE_run_time: 100
+  GE_every: 10
+
+  # output
+  outfile: None
+
