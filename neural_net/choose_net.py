@@ -42,9 +42,9 @@ class Classic_MLP(nn.Module):  # VGG
         return out
 
 
-class cnn_block(nn.Module):
+class cnn_best_block(nn.Module):
     def __init__(self, in_channels, out_channels):
-        super(cnn_block, self).__init__()
+        super(cnn_best_block, self).__init__()
         self.conv1 = nn.Sequential(
             nn.Conv1d(in_channels, out_channels, kernel_size=11, stride=1, padding=5),
             nn.ReLU(),
@@ -56,19 +56,19 @@ class cnn_block(nn.Module):
         return y
 
 
-class ascad_cnn(nn.Module):
+class ascad_cnn_best(nn.Module):
     def __init__(self, out_dim, point_num):
-        super(ascad_cnn, self).__init__()
+        super(ascad_cnn_best, self).__init__()
 
         self.bn = nn.Sequential(
             nn.BatchNorm1d(point_num)
         )
 
-        self.cnn1 = cnn_block(1, 64)
-        self.cnn2 = cnn_block(64, 128)
-        self.cnn3 = cnn_block(128, 256)
-        self.cnn4 = cnn_block(256, 512)
-        self.cnn5 = cnn_block(512, 512)
+        self.cnn1 = cnn_best_block(1, 64)
+        self.cnn2 = cnn_best_block(64, 128)
+        self.cnn3 = cnn_best_block(128, 256)
+        self.cnn4 = cnn_best_block(256, 512)
+        self.cnn5 = cnn_best_block(512, 512)
 
         self.fullc1 = nn.Sequential(
             nn.Linear(512 * int(point_num / 32), 4096),
