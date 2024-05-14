@@ -443,6 +443,7 @@ class Bilinear_CNN(nn.Module):  # Improving Deep Learning Based Second-Order Sid
         output = self.fc_end(x)
         return output
 
+
 class Bilinear_CNN_N100(nn.Module):  # Improving Deep Learning Based Second-Order Side-Channel Analysis With Bilinear CNN
     def __init__(self, out_dim, point_num):
         super(Bilinear_CNN_N100, self).__init__()
@@ -503,7 +504,7 @@ class Bilinear_CNN_N100(nn.Module):  # Improving Deep Learning Based Second-Orde
 
 def simclr_net(config: dict):
     """ Choose model with model_type """
-    net_dict = {"ascad_cnn": ascad_cnn(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
+    net_dict = {"ascad_cnn": ascad_cnn_best(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "ascad_cnn_bn": ascad_cnn_BN(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "classic_mlp": Classic_MLP(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
                 "MECNN_N0": MECNN_N0(out_dim=config["out_dim"], point_num=config['common']["feature_num"]),
