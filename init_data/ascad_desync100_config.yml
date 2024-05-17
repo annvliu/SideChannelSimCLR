@@ -16,7 +16,7 @@ common:
   disable_cuda: False
   gpu_index: 0
 
-  model_name: 'MECNN_N100'
+  model_name: 'ascad_cnn'
   batch_size: 256
 
 # pretrain
@@ -52,10 +52,9 @@ tuning:
   frozen: False
   add_dense_bool: False
 
-  optim: 'Adam'
-  scheduler: 'MECNN OneCycleLR'
-  epoch: 50
-  lr: 0.01
+  optim: 'RMSprop'
+  epoch: 150
+  lr: 0.00001
 
   # GE para
   GE_epoch: None
