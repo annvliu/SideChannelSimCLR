@@ -9,6 +9,7 @@ from data_aug.data_envelope import DataEnvelope
 from data_aug.data_cut import DataCut
 from data_aug.data_filter import DataFilter
 from data_aug.data_shifts import DataShift
+from data_aug.data_window_filter import DataWinFilter
 
 
 class NetDataset(Dataset):
@@ -35,7 +36,7 @@ class ContrastiveLearningDataset:
     def __init__(self, config):
         self.init_data = np.load(config['common']['init_data_folder'] + config['common']['trs_fname'])
         self.init_label = np.load(config['common']['init_data_folder'] + config['common']['label_fname'])  # seg_label
-        if len(self.init_label.shape) > 1:                                       # official
+        if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
         self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
         self.init_data = self.init_data.astype('float32')
@@ -56,6 +57,8 @@ class ContrastiveLearningDataset:
         for key in aug:
             if key == 'data_filter' and aug[key] is not None:
                 trans_list.append(DataFilter(filter_weight=aug[key]))
+            elif key == 'data_window_filter' and aug[key] is not None:
+                trans_list.append(DataWinFilter(filter_weight=aug[key]))
             elif key == 'data_shift' and aug[key] is not None:
                 trans_list.append(DataShift(delay_num_of_operation=aug[key]))
             elif key == 'data_cut' and aug[key] is not None:
@@ -76,7 +79,7 @@ class LinearEvaluationDataset:
     def __init__(self, config):
         self.init_data = np.load(config['init_data_folder'] + config['trs_fname'])
         self.init_label = np.load(config['init_data_folder'] + config['label_fname'])  # seg_label
-        if len(self.init_label.shape) > 1:                                       # official
+        if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
         self.init_plain = np.load(config['init_data_folder'] + config['plain_fname'])
 
@@ -96,11 +99,10 @@ def FineTuningDataset(cfg):
     train_num, valid_num = cfg['train_num'], 0 if 'valid_num' not in cfg else cfg['valid_num']
     print("train num:", train_num, "valid num:", valid_num)
 
-    network_datasets = [NetDataset(init_data[:train_num], init_label[:train_num], init_plain[:train_num])]   # train
+    network_datasets = [NetDataset(init_data[:train_num], init_label[:train_num], init_plain[:train_num])]  # train
     network_datasets += [] if valid_num == 0 else [NetDataset(init_data[train_num:train_num + valid_num],  # train
                                                               init_label[train_num:train_num + valid_num],
                                                               init_plain[train_num:train_num + valid_num])]
     network_datasets += [NetDataset(init_data[train_num + valid_num:], init_label[train_num + valid_num:],  # train
                                     init_plain[train_num + valid_num:])]
     return network_datasets
-
