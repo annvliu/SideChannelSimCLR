@@ -1,8 +1,9 @@
 import numpy as np
 import torch
+import time
 import multiprocessing
 
-from sqlite_command import select_path_from_no, change_GE
+from sqlite_command import select_path_from_no, change_GE, find_no_for_GE
 from utils import load_config_data
 
 
@@ -154,3 +155,38 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
 
     if epoch_list != ['valid']:
         change_GE(no, min_GE, min_GE_epoch)
+
+
+def subprocess_tuning_experiment(stop_event, i):
+    while not stop_event.is_set():
+        result = find_no_for_GE()
+        # result = None
+        if result:
+            calculate_tuning_GE(result)
+        else:
+            print("进程", i, "正在监听……")
+            time.sleep(10)
+    print("子进程", i, "结束！")
+
+
+def monitor_GE_process(process_num=3):
+    # 创建一个事件对象用于控制进程停止
+    stop_event = multiprocessing.Event()
+    processes = []
+    for i in range(process_num):
+        process = multiprocessing.Process(target=subprocess_tuning_experiment, args=(stop_event, i))
+        processes.append(process)
+        process.start()
+        time.sleep(3)
+
+    try:
+        for process in processes:
+            process.join()
+    except KeyboardInterrupt:
+        # 设置事件，通知所有监听进程停止
+        stop_event.set()
+        for process in processes:
+            if process.is_alive():
+                print("子进程", process.pid, "未响应停止信号，强制终止...")
+                process.terminate()
+                process.join()

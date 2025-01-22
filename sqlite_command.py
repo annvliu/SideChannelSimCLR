@@ -5,6 +5,7 @@ def insert_pretrain(config):
     # 连接数据库
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
+    cur.execute('PRAGMA busy_timeout = 10000')
 
     # 创建表
     create_table = "create table if not exists SimCLR_result(no INTEGER PRIMARY KEY AUTOINCREMENT, type text, " \
@@ -41,6 +42,7 @@ def insert_network(config, best_GE, best_GE_epoch):
     # 连接数据库
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
+    cur.execute('PRAGMA busy_timeout = 10000')
 
     # 创建表
     create_table = "create table if not exists SimCLR_result(no INTEGER PRIMARY KEY AUTOINCREMENT, type text, " \
@@ -85,6 +87,7 @@ def select_path_from_no(no):
     # 连接表
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
+    cur.execute('PRAGMA busy_timeout = 10000')
 
     # 寻找no对应路径
     select_path = "SELECT path FROM SimCLR_result WHERE no = " + str(no)
@@ -102,6 +105,7 @@ def select_tuning_from_pretrain(pretrain_no):
     # 连接表
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
+    cur.execute('PRAGMA busy_timeout = 10000')
 
     # 寻找no对应路径
     select_tuning = "SELECT no FROM SimCLR_result WHERE pretrain_no = " + str(pretrain_no)
@@ -120,6 +124,7 @@ def change_GE(no, GE, GE_epoch):
     # 连接表
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
+    cur.execute('PRAGMA busy_timeout = 10000')
 
     update_GE = "UPDATE SimCLR_result SET GE = " + str(GE) + ", GE_epoch = " + str(GE_epoch) + " where no = " + str(no)
     cur.execute(update_GE)
@@ -134,6 +139,7 @@ def select_optimism_GE(no):
     # 连接表
     conn = sqlite3.connect('SimCLR_result.db')
     cur = conn.cursor()
+    cur.execute('PRAGMA busy_timeout = 10000')
 
     select_GE = "SELECT GE, GE_epoch FROM SimCLR_result where no = " + str(no)
     cur.execute(select_GE)
@@ -144,3 +150,46 @@ def select_optimism_GE(no):
     conn.close()
 
     return result
+
+
+def find_no_for_GE():
+    result = None
+    try:
+        # 打开数据库连接
+        conn = sqlite3.connect('SimCLR_result.db')
+        conn.execute('PRAGMA busy_timeout = 10000')  # 设置锁超时时间
+        cur = conn.cursor()
+
+        # 开始 EXCLUSIVE 事务
+        cur.execute('BEGIN EXCLUSIVE TRANSACTION')
+
+        # 查询满足条件的第一条记录
+        cur.execute("""
+            SELECT no FROM SimCLR_result 
+            WHERE GE_epoch = -1 AND type = 'tuning' AND no > 5660 
+            LIMIT 1;
+        """)
+        result = cur.fetchone()
+
+        if result:
+            # 使用参数化查询更新记录，避免 SQL 注入
+            cur.execute("""
+                UPDATE SimCLR_result 
+                SET GE_epoch = 0 
+                WHERE no = ?;
+            """, (result[0],))
+            conn.commit()
+            print("事务提交成功！")
+        else:
+            print("未找到满足条件的记录。")
+            conn.commit()  # 提交事务，即使没有更新操作
+    except Exception as e:
+        print(f"事务失败，已回滚：{e}")
+        conn.rollback()  # 回滚事务
+    finally:
+        # 关闭游标和连接
+        if 'cur' in locals():
+            cur.close()
+        conn.close()
+
+    return result[0] if result else None
