@@ -67,7 +67,8 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, epoch, resu
         this_run_GE = np.zeros(int(trs_num / config['GE_every']), dtype=float)
         for i in range(1, int(trs_num / config['GE_every']) + 1):
             if i % 100 == 0:
-                print("正在计算实验", no, "epoch", epoch, "第", process_num * process_no + run_time, "次攻击",
+                print("正在计算实验", no, "epoch", epoch, "第",
+                      int(config['GE_run_time'] / process_num) * process_no + run_time, "次攻击",
                       i * config['GE_every'], "条波形的GE")
 
             tmp_id = trs_random[:i * config['GE_every']]
@@ -78,7 +79,7 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, epoch, resu
         result.put(this_run_GE)
 
 
-def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_num=10):
+def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_num=20):
     trs_num = plain.shape[0]
 
     key_proba = np.zeros((trs_num, 256), dtype=float)
