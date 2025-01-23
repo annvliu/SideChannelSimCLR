@@ -157,9 +157,9 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
         change_GE(no, min_GE, min_GE_epoch)
 
 
-def subprocess_tuning_experiment(stop_event, i):
+def subprocess_tuning_experiment(min_no, stop_event, i):
     while not stop_event.is_set():
-        result = find_no_for_GE()
+        result = find_no_for_GE(min_no=min_no)
         # result = None
         if result:
             calculate_tuning_GE(result)
@@ -169,12 +169,12 @@ def subprocess_tuning_experiment(stop_event, i):
     print("子进程", i, "结束！")
 
 
-def monitor_GE_process(process_num=3):
+def monitor_GE_process(process_num=3, min_no=1):
     # 创建一个事件对象用于控制进程停止
     stop_event = multiprocessing.Event()
     processes = []
     for i in range(process_num):
-        process = multiprocessing.Process(target=subprocess_tuning_experiment, args=(stop_event, i))
+        process = multiprocessing.Process(target=subprocess_tuning_experiment, args=(min_no, stop_event, i))
         processes.append(process)
         process.start()
         time.sleep(3)
