@@ -12,7 +12,7 @@ def insert_pretrain(config):
                    "path text, pretrain_path text, dataset text, train_num number, model text, add_dense int, " \
                    "batch_size number, epoch number, lr number, out_dim number, shift number, cut number, " \
                    "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int, frozen int, " \
-                   "pretrain_train_num int, tuning_optim text)"
+                   "pretrain_train_num int, tuning_optim text, projection_layer int)"
     cur.execute(create_table)
 
     # 插入数据
@@ -21,8 +21,8 @@ def insert_pretrain(config):
             config['out_dim'], 'data_shift' in config["augmentation"] and config["augmentation"]['data_shift'],
             'data_cut' in config["augmentation"] and config["augmentation"]['data_cut'],
             'data_filter' in config["augmentation"] and config["augmentation"]['data_filter'], None, None, None, None,
-            None, config["train_num"], None)
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            None, config["train_num"], None, config["projection_head_layer"])
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 
@@ -49,7 +49,7 @@ def insert_network(config, best_GE, best_GE_epoch):
                    "path text, pretrain_path text, dataset text, train_num number, model text, add_dense int, " \
                    "batch_size number, epoch number, lr number, out_dim number, shift number, cut number, " \
                    "filter number, GE number, GE_epoch number, model_eval int, pretrain_no int, frozen int, " \
-                   "pretrain_train_num int, tuning_optim text)"
+                   "pretrain_train_num int, tuning_optim text, projection_layer int)"
     cur.execute(create_table)
 
     # 插入数据
@@ -66,8 +66,8 @@ def insert_network(config, best_GE, best_GE_epoch):
             config['common']['dataset_name'], config['train_num'], config['common']['model_name'],
             1 if config['add_dense_bool'] else 0, config['common']['batch_size'], config['epoch'], config['lr'],
             config['out_dim'], None, None, None, best_GE, best_GE_epoch, 1 if config['model_eval'] else 0,
-            pretrain_no, 1 if config['frozen'] else 0, None, config['optim'])
-    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+            pretrain_no, 1 if config['frozen'] else 0, None, config['optim'], None)
+    order = "INSERT INTO SimCLR_result VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     conn.execute(order, data)
     conn.commit()
 

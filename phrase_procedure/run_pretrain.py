@@ -38,7 +38,7 @@ def pretrain_main(init_cfg):
                                                pin_memory=True, drop_last=True)
 
     model = simclr_net(config=cfg)
-    model = add_projection_head(model)
+    model = add_projection_head(model, cfg)
 
     optimizer = torch.optim.Adam(model.parameters(), cfg['lr'], weight_decay=cfg['wd'])
 

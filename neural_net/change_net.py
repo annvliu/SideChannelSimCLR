@@ -2,10 +2,16 @@ import torch
 import torch.nn as nn
 
 
-def add_projection_head(model):
+def add_projection_head(model, config):
+    projection_list = []
     dim_mlp = model.fc_end.in_features
-    model.fc_end = nn.Sequential(nn.Linear(dim_mlp, dim_mlp), nn.ReLU(), model.fc_end)
-
+    if config["projection_head_layer"] > 0:
+        projection_list.append(nn.Linear(dim_mlp, dim_mlp))
+        for i in range(config["projection_head_layer"] - 1):
+            projection_list.append(nn.ReLU())
+            projection_list.append(nn.Linear(dim_mlp, dim_mlp))
+    print(projection_list)
+    model.fc_end = nn.Sequential(*projection_list)
     return model
 
 

@@ -29,6 +29,7 @@ pretrain:
   wd: 0.0001
 
   out_dim: 128
+  projection_head_layer: 2
   temperature: 0.07
   n_views: 2
 
