@@ -38,7 +38,7 @@ class ContrastiveLearningDataset:
         self.init_label = np.load(config['common']['init_data_folder'] + config['common']['label_fname'])  # seg_label
         if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
-        if config['common']['plain_fname'] is not None:
+        if config['common']['plain_fname'] != '':
             self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
         else:
             self.init_plain = np.asarray([0] * self.init_data.shape[0])
@@ -84,7 +84,7 @@ class LinearEvaluationDataset:
         self.init_label = np.load(config['init_data_folder'] + config['label_fname'])  # seg_label
         if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
-        if config['common']['plain_fname'] is not None:
+        if config['common']['plain_fname'] != '':
             self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
         else:
             self.init_plain = np.asarray([0] * self.init_data.shape[0])
@@ -99,7 +99,7 @@ class LinearEvaluationDataset:
 def FineTuningDataset(cfg):
     init_data = np.load(cfg['common']['init_data_folder'] + cfg['common']['trs_fname'])
     init_label = np.load(cfg['common']['init_data_folder'] + cfg['common']['label_fname'])
-    if cfg['common']['plain_fname'] is not None:
+    if cfg['common']['plain_fname'] != '':
         init_plain = np.load(cfg['common']['init_data_folder'] + cfg['common']['plain_fname'])
     else:
         init_plain = np.asarray([0] * init_data.shape[0])

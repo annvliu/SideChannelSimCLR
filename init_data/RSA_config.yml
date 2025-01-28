@@ -7,7 +7,7 @@ common:
   init_data_folder: 'init_data/'
   trs_fname: 'RSA_trs.npy'
   label_fname: 'RSA_label.npy'
-  plain_fname: None
+  plain_fname: ''
   feature_num: 3306
   leakage_model: 'ID'
   classification: 2
