@@ -38,7 +38,10 @@ class ContrastiveLearningDataset:
         self.init_label = np.load(config['common']['init_data_folder'] + config['common']['label_fname'])  # seg_label
         if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
-        self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
+        if config['plain_fname'] is not None:
+            self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
+        else:
+            self.init_plain = np.asarray([0] * self.init_data.shape[0])
         self.init_data = self.init_data.astype('float32')
 
         self.aug = config["augmentation"]
@@ -81,7 +84,10 @@ class LinearEvaluationDataset:
         self.init_label = np.load(config['init_data_folder'] + config['label_fname'])  # seg_label
         if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
-        self.init_plain = np.load(config['init_data_folder'] + config['plain_fname'])
+        if config['plain_fname'] is not None:
+            self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
+        else:
+            self.init_plain = np.asarray([0] * self.init_data.shape[0])
 
     def get_dataset(self):
         print("train num:", self.init_label.shape[0])
