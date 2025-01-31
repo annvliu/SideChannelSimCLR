@@ -14,10 +14,11 @@ png/*
 runs/*
 init_data/*.npy
 init_data/*.png
-init_data/test.py
+init_data/data_process.py
 /run_main5.py
 /run_main6.py
 /run_main8.py
 /run_main7.py
 /run_main9.py
 /init_data/20PMLR_A Simple Framework for Contrastive Learning of Visual Representations.pdf
+/Journal_Fig.py
