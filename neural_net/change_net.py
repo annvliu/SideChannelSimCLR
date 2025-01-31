@@ -23,7 +23,7 @@ def copy_model_for_classification(model, refer_model_file, frozen, add_dense=Fal
 
     if refer_model_file is not None:
         model_dict = model.state_dict()
-        pretrain_dict = torch.load(refer_model_file + 'checkpoint.tar')['state_dict']
+        pretrain_dict = torch.load(refer_model_file + 'checkpoint.tar', map_location=torch.device('cpu'))['state_dict']
 
         # create dict contains pretrain_state_dict without fc_end, and contains fc_end of base_model_state_dict
         new_dict = {k: v for k, v in pretrain_dict.items() if not k.startswith("fc_end")}
