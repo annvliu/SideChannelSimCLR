@@ -148,7 +148,7 @@ class DeepLearning:
                     plain_numpy = plain.numpy().reshape(self.config['common']['batch_size'], -1)
                     plain_GE = np.vstack((plain_GE, plain_numpy)) if plain_GE is not None else plain_numpy
 
-            topn = accuracy(all_outputs, all_labels, (1, 5))
+            topn = accuracy(all_outputs, all_labels)
 
             if epoch_counter + 1 in self.config['GE_epoch'] or valid_test:
                 proba_plain = np.hstack((predict_proba, plain_GE))
