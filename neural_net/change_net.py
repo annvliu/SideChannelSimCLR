@@ -10,6 +10,8 @@ def add_projection_head(model, config):
         for i in range(config["projection_head_layer"] - 1):
             projection_list.append(nn.ReLU())
             projection_list.append(nn.Linear(dim_mlp, dim_mlp))
+    else:
+        model.fullc2_relu = nn.Sequential()
     print(projection_list)
     model.fc_end = nn.Sequential(*projection_list)
     return model
