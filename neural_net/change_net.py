@@ -12,6 +12,7 @@ def add_projection_head(model, config):
             projection_list.append(nn.Linear(config["out_dim"], config["out_dim"]))
     else:
         model.fullc2_relu = nn.Sequential()
+        config["out_dim"] = dim_mlp
     print(projection_list)
     model.fc_end = nn.Sequential(*projection_list)
     return model
