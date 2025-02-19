@@ -34,14 +34,14 @@ class NetDataset(Dataset):
 
 class ContrastiveLearningDataset:
     def __init__(self, config):
-        self.init_data = np.load(config['common']['init_data_folder'] + config['common']['trs_fname'])
-        self.init_label = np.load(config['common']['init_data_folder'] + config['common']['label_fname'])  # seg_label
+        self.init_data = np.load(config['common']['init_data_folder'] + config['common']['trs_fname'], mmap_mode='r')
+        self.init_label = np.load(config['common']['init_data_folder'] + config['common']['label_fname'], mmap_mode='r')
         if len(self.init_label.shape) > 1:
             self.init_label = self.init_label[:, 1]
         if config['common']['plain_fname'] != '':
-            self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
+            self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'], mmap_mode='r')
         else:
-            self.init_plain = np.asarray([0] * self.init_data.shape[0])
+            self.init_plain = self.init_label
         self.init_data = self.init_data.astype('float32')
 
         self.aug = config["augmentation"]
@@ -97,12 +97,12 @@ class LinearEvaluationDataset:
 
 
 def FineTuningDataset(cfg):
-    init_data = np.load(cfg['common']['init_data_folder'] + cfg['common']['trs_fname'])
-    init_label = np.load(cfg['common']['init_data_folder'] + cfg['common']['label_fname'])
+    init_data = np.load(cfg['common']['init_data_folder'] + cfg['common']['trs_fname'], mmap_mode='r')
+    init_label = np.load(cfg['common']['init_data_folder'] + cfg['common']['label_fname'], mmap_mode='r')
     if cfg['common']['plain_fname'] != '':
-        init_plain = np.load(cfg['common']['init_data_folder'] + cfg['common']['plain_fname'])
+        init_plain = np.load(cfg['common']['init_data_folder'] + cfg['common']['plain_fname'], mmap_mode='r')
     else:
-        init_plain = np.asarray([0] * init_data.shape[0])
+        init_plain = init_label
     init_data = init_data.astype('float32')
 
     train_num, valid_num = cfg['train_num'], 0 if 'valid_num' not in cfg else cfg['valid_num']
