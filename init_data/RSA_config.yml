@@ -21,7 +21,7 @@ common:
 
 # pretrain
 pretrain:
-  train_num: 0
+  train_num: 50000
 
   # network
   epoch: 200
@@ -44,7 +44,7 @@ pretrain:
 
 tuning:
   # data para
-  train_num: 400000
+  train_num: 40000
   out_dim: 2
 
   # model para
