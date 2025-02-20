@@ -109,9 +109,13 @@ def FineTuningDataset(cfg):
     print("train num:", train_num, "valid num:", valid_num)
 
     network_datasets = [NetDataset(init_data[:train_num], init_label[:train_num], init_plain[:train_num])]  # train
-    network_datasets += [] if valid_num == 0 else [NetDataset(init_data[train_num:train_num + valid_num],  # train
+    network_datasets += [] if valid_num == 0 else [NetDataset(init_data[train_num:train_num + valid_num],  # valid
                                                               init_label[train_num:train_num + valid_num],
                                                               init_plain[train_num:train_num + valid_num])]
-    network_datasets += [NetDataset(init_data[train_num + valid_num:], init_label[train_num + valid_num:],  # train
-                                    init_plain[train_num + valid_num:])]
+    if isinstance(cfg['GE_trsnum'], (int,)):
+        end_num = train_num + valid_num + cfg['GE_trsnum']
+    else:
+        end_num = init_data.shape[0]
+    network_datasets += [NetDataset(init_data[train_num + valid_num:end_num], init_label[train_num + valid_num:end_num],  # test
+                                    init_plain[train_num + valid_num:end_num])]
     return network_datasets
