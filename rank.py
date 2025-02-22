@@ -35,6 +35,9 @@ class Sbox:
         return np.where(self.SBox_value == x)[0][0]
 
 
+FESH_Sbox = [3, 13, 15, 10, 0, 7, 12, 1, 4, 2, 9, 5, 11, 14, 6, 8]
+
+
 def compute_leakage(dataset_name, plain, key):
     sbox = Sbox()
     if 'ascad' in dataset_name:
@@ -58,6 +61,10 @@ def compute_leakage(dataset_name, plain, key):
     elif 'AES_HD' in dataset_name:
         return sbox.inverse_s_box(plain[1] ^ key) ^ plain[0]
 
+    elif 'FESH' in dataset_name:
+        print(plain)
+        return FESH_Sbox[plain[0] ^ key]
+
 
 def once_GE(no, process_no, process_num, trs_num, key_proba, config, epoch, result):
     for run_time in range(int(config['GE_run_time'] / process_num)):
@@ -80,7 +87,7 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, epoch, resu
         result.put(this_run_GE)
 
 
-def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_num=20):
+def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_num=10):
     trs_num = plain.shape[0]
 
     key_proba = np.zeros((trs_num, 256), dtype=float)
@@ -96,7 +103,8 @@ def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_nu
     for process_no in range(process_num):
         new_process = multiprocessing.Process(target=once_GE,
                                               args=(
-                                              no, process_no, process_num, trs_num, key_proba, config, epoch, result))
+                                                  no, process_no, process_num, trs_num, key_proba, config, epoch,
+                                                  result))
         process_list.append(new_process)
         new_process.start()
 
@@ -137,7 +145,8 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
 
     for GE_epoch in epoch_list:
         proba_plain = np.load(path + 'proba_plain_' + str(GE_epoch) + '.npy')[:]
-        GE_trnum = proba_plain.shape[0] if 'GE_trsnum' not in cfg or cfg['GE_trsnum'] == 0 or cfg['GE_trsnum'] > proba_plain.shape[0] else cfg['GE_trsnum']
+        GE_trnum = proba_plain.shape[0] if 'GE_trsnum' not in cfg or cfg['GE_trsnum'] == 0 or cfg['GE_trsnum'] > \
+                                           proba_plain.shape[0] else cfg['GE_trsnum']
 
         proba = proba_plain[:GE_trnum, :cfg['out_dim']]
         plain = np.asarray(proba_plain[:GE_trnum, cfg['out_dim']:], dtype=int)
