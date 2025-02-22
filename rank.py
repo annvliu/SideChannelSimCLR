@@ -89,12 +89,13 @@ def once_GE(no, process_no, process_num, trs_num, key_proba, config, epoch, resu
 
 def GE_plot_multiprocess(no, epoch, probability, plain, config: dict, process_num=10):
     trs_num = plain.shape[0]
+    key_guess_num = 16 if 'FESH' in config['common']['dataset_name'] else 256
 
-    key_proba = np.zeros((trs_num, 256), dtype=float)
+    key_proba = np.zeros((trs_num, key_guess_num), dtype=float)
     log_softmax = torch.nn.LogSoftmax(dim=1)
     attack_proba = log_softmax(torch.from_numpy(probability))
     for j in range(trs_num):
-        for candidate_key in range(256):
+        for candidate_key in range(key_guess_num):
             key_proba[j][candidate_key] = attack_proba[j][
                 compute_leakage(config['common']['dataset_name'], plain[j], candidate_key)]
 
