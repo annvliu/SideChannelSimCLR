@@ -62,7 +62,6 @@ def compute_leakage(dataset_name, plain, key):
         return sbox.inverse_s_box(plain[1] ^ key) ^ plain[0]
 
     elif 'FESH' in dataset_name:
-        print(plain)
         return FESH_Sbox[plain[0] ^ key]
 
 
