@@ -166,7 +166,7 @@ def find_no_for_GE(min_no):
         # 查询满足条件的第一条记录
         cur.execute("""
             SELECT no FROM SimCLR_result 
-            WHERE GE_epoch = -1 AND type = 'tuning' AND no >= ? 
+            WHERE GE_epoch = -1 AND type in ('tuning', 'network') AND no >= ? 
             LIMIT 1;
         """, (min_no,))
         result = cur.fetchone()
