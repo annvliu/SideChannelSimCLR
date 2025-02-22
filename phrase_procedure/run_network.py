@@ -32,8 +32,10 @@ def network_main(init_cfg, GE_list=None):
         cfg['common']['gpu_index'] = -1
 
     network_datasets = FineTuningDataset(cfg)
-    network_dataloaders = [torch.utils.data.DataLoader(dataset, batch_size=cfg['common']['batch_size'], shuffle=True,
-                                                       pin_memory=True, drop_last=True) for dataset in network_datasets]
+    network_dataloaders = [torch.utils.data.DataLoader(network_datasets[0], batch_size=cfg['common']['batch_size'],
+                                                       shuffle=True, pin_memory=True, drop_last=True)]
+    network_dataloaders += [torch.utils.data.DataLoader(dataset, batch_size=cfg['common']['batch_size'], shuffle=False,
+                                                        pin_memory=True, drop_last=False) for dataset in network_datasets[1:]]
 
     model = simclr_net(config=cfg)
     # total_num = sum(p.numel() for p in model.parameters() if p.requires_grad)

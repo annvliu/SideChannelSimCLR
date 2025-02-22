@@ -2,8 +2,10 @@ from torchvision.transforms import transforms
 from torchvision import transforms, datasets
 import numpy as np
 import pdb
+import copy
 from torch.utils.data import Dataset
 import torch
+
 from data_aug.view_generator import ContrastiveLearningViewGenerator
 from data_aug.data_envelope import DataEnvelope
 from data_aug.data_cut import DataCut
@@ -41,7 +43,7 @@ class ContrastiveLearningDataset:
         if config['common']['plain_fname'] != '':
             self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'], mmap_mode='r')
         else:
-            self.init_plain = self.init_label
+            self.init_plain = copy.deepcopy(self.init_label)
         self.init_data = self.init_data.astype('float32')
 
         self.aug = config["augmentation"]
@@ -87,7 +89,7 @@ class LinearEvaluationDataset:
         if config['common']['plain_fname'] != '':
             self.init_plain = np.load(config['common']['init_data_folder'] + config['common']['plain_fname'])
         else:
-            self.init_plain = np.asarray([0] * self.init_data.shape[0])
+            self.init_plain = copy.deepcopy(self.init_label)
 
     def get_dataset(self):
         print("train num:", self.init_label.shape[0])
@@ -102,7 +104,7 @@ def FineTuningDataset(cfg):
     if cfg['common']['plain_fname'] != '':
         init_plain = np.load(cfg['common']['init_data_folder'] + cfg['common']['plain_fname'], mmap_mode='r')
     else:
-        init_plain = init_label
+        init_plain = copy.deepcopy(init_label)
     init_data = init_data.astype('float32')
 
     train_num, valid_num = cfg['train_num'], 0 if 'valid_num' not in cfg else cfg['valid_num']
