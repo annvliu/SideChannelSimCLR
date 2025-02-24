@@ -52,6 +52,7 @@ tuning:
   model_eval: False
   frozen: False
   add_dense_bool: False
+  save_model_epoch: 10
 
   optim: 'RMSprop'
   epoch: 150

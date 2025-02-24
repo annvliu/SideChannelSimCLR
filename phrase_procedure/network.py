@@ -155,7 +155,7 @@ class DeepLearning:
                 fname = self.config['outfile'] + 'proba_plain_' + (str(epoch_counter + 1) if not valid_test else 'valid')
                 np.save(fname, proba_plain)
 
-            if epoch_counter + 1 == self.config['GE_epoch'] or valid_test:
+            if ('save_model_epoch' in self.config and epoch_counter + 1 == self.config['save_model_epoch']) or valid_test:
                 torch.save({
                     'epoch': epoch_counter + 1,
                     'state_dict': self.model.state_dict(),
