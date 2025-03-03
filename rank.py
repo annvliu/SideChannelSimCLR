@@ -132,7 +132,7 @@ def search_min(GE_trs, GE_every):
                 return 0, trsnum * GE_every
 
 
-def calculate_tuning_GE(no, calculated_epoch_list=None):
+def calculate_tuning_GE(no, calculated_epoch_list=None, GE_process_num=10):
     path = select_path_from_no(no)
     cfg = load_config_data(path + 'config.yml')
 
@@ -150,7 +150,7 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
 
         proba = proba_plain[:GE_trnum, :cfg['out_dim']]
         plain = np.asarray(proba_plain[:GE_trnum, cfg['out_dim']:], dtype=int)
-        GE = GE_plot_multiprocess(no, GE_epoch, proba, plain, cfg)
+        GE = GE_plot_multiprocess(no, GE_epoch, proba, plain, cfg, GE_process_num)
         np.save(path + 'GE_' + str(GE_epoch) + '.npy', GE)
 
         GE_ave = GE.mean(axis=0)
@@ -166,24 +166,24 @@ def calculate_tuning_GE(no, calculated_epoch_list=None):
         change_GE(no, min_GE, min_GE_epoch)
 
 
-def subprocess_tuning_experiment(min_no, stop_event, i):
+def subprocess_tuning_experiment(min_no, stop_event, i, GE_process_num=10):
     while not stop_event.is_set():
         result = find_no_for_GE(min_no=min_no)
         # result = None
         if result:
-            calculate_tuning_GE(result)
+            calculate_tuning_GE(result, GE_process_num=GE_process_num)
         else:
             print("进程", i, "正在监听……")
             time.sleep(10)
     print("子进程", i, "结束！")
 
 
-def monitor_GE_process(process_num=3, min_no=1):
+def monitor_GE_process(process_num=3, min_no=1, GE_process_num=10):
     # 创建一个事件对象用于控制进程停止
     stop_event = multiprocessing.Event()
     processes = []
     for i in range(process_num):
-        process = multiprocessing.Process(target=subprocess_tuning_experiment, args=(min_no, stop_event, i))
+        process = multiprocessing.Process(target=subprocess_tuning_experiment, args=(min_no, stop_event, i, GE_process_num))
         processes.append(process)
         process.start()
         time.sleep(3)
