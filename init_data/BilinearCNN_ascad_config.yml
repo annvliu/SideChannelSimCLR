@@ -54,7 +54,7 @@ tuning:
   add_dense_bool: False
 
   optim: 'Adam'
-  scheduler: 'BilinearCNN OneCycleLR'  # None
+  scheduler: 'BilinearCNN OneCycleLR'
   epoch: 50
   lr: 0.01
 

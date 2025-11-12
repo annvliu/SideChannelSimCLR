@@ -92,7 +92,7 @@ def select_path_from_no(no):
     # 寻找no对应路径
     select_path = "SELECT path FROM SimCLR_result WHERE no = " + str(no)
     cur.execute(select_path)
-    path = cur.fetchall()[0][0]  # 获取查询结果一般可用.fetchone()方法（获取第一条），或者用.fetchall()方法（获取所有条）
+    path = cur.fetchall()[0][0]  
 
     # 关闭连接
     cur.close()
