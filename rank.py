@@ -129,7 +129,7 @@ def search_min(GE_trs, GE_every):
     else:
         for trsnum, value in enumerate(GE_trs):
             if value == 0:
-                return 0, trsnum * GE_every
+                return 0, (trsnum + 1) * GE_every
 
 
 def calculate_tuning_GE(no, calculated_epoch_list=None, GE_process_num=10):
